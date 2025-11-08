@@ -1,59 +1,38 @@
+import 'package:bhtapp/views/pages/wellcome_page.dart';
 import 'package:flutter/material.dart';
-import 'theme/colors.dart';
-import 'pages/home_page.dart';
-import 'pages/kegiatan_page.dart';
-import 'pages/donasi_page.dart';
-import 'pages/kontak_page.dart';
-import 'pages/more_page.dart';
-import 'widgets/bottom_nav.dart';
 
+/// The application entry point.
+///
+/// This function is called when the application is launched.
+/// It runs the application by calling [runApp] with an instance of [MainApp].
 void main() {
-  runApp(const RasaDharmaApp());
+  runApp(const MainApp());
 }
 
-class RasaDharmaApp extends StatelessWidget {
-  const RasaDharmaApp({super.key});
+class MainApp extends StatefulWidget {
+  const MainApp({super.key});
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Rasa Dharma',
       debugShowCheckedModeBanner: false,
+
       theme: ThemeData(
-        fontFamily: 'ModernSans',
-        scaffoldBackgroundColor: AppColors.background,
-        primaryColor: AppColors.primary,
+        brightness: Brightness.light,
+        primaryColor: Colors.amber[100],
       ),
-      home: const MainShell(),
-    );
-  }
-}
-
-class MainShell extends StatefulWidget {
-  const MainShell({super.key});
-
-  @override
-  State<MainShell> createState() => _MainShellState();
-}
-
-class _MainShellState extends State<MainShell> {
-  int _index = 0;
-
-  final _pages = const [
-    HomePage(),
-    KegiatanPage(),
-    DonasiPage(),
-    KontakPage(),
-    MorePage(),
-  ];
-
-  void _onTap(int i) => setState(() => _index = i);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(child: _pages[_index]),
-      bottomNavigationBar: BottomNav(currentIndex: _index, onTap: _onTap),
+      home: SafeArea(child: Scaffold(body: WellcomePage())),
     );
   }
 }
