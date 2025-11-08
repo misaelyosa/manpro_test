@@ -1,7 +1,7 @@
-import 'package:bhtapp/data/classes/Events.dart';
-import 'package:bhtapp/views/widgets/events_card.dart';
-import 'package:bhtapp/views/widgets/segmented_control.dart';
 import 'package:flutter/material.dart';
+import 'package:rasadharma_app/data/classes/Events.dart';
+import 'package:rasadharma_app/views/widgets/events_card.dart';
+import 'package:rasadharma_app/views/widgets/segmented_control.dart';
 
 class KegiatanPages extends StatefulWidget {
   const KegiatanPages({super.key});

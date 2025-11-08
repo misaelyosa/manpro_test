@@ -1,11 +1,11 @@
-import 'package:bhtapp/data/notifiers.dart';
-import 'package:bhtapp/views/pages/donasi_page.dart';
-import 'package:bhtapp/views/pages/home_page.dart';
-import 'package:bhtapp/views/pages/kegiatan_pages.dart';
-import 'package:bhtapp/views/pages/kontak_page.dart';
-import 'package:bhtapp/views/pages/more_pages.dart';
-import 'package:bhtapp/views/widgets/navbar_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:rasadharma_app/data/notifiers.dart';
+import 'package:rasadharma_app/views/pages/donasi_page.dart';
+import 'package:rasadharma_app/views/pages/home_page.dart';
+import 'package:rasadharma_app/views/pages/kegiatan_pages.dart';
+import 'package:rasadharma_app/views/pages/kontak_page.dart';
+import 'package:rasadharma_app/views/pages/more_pages.dart';
+import 'package:rasadharma_app/views/widgets/navbar_widget.dart';
 
 List<Widget> pages = [
   HomePage(),

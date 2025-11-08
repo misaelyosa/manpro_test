@@ -1,5 +1,5 @@
-import 'package:bhtapp/data/classes/Events.dart';
 import 'package:flutter/material.dart';
+import 'package:rasadharma_app/data/classes/Events.dart';
 
 class EventsCard extends StatefulWidget {
   const EventsCard({super.key, required this.event, this.onRegister});

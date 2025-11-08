@@ -1,7 +1,6 @@
-import 'package:bhtapp/data/notifiers.dart';
-// import 'package:bhtapp/views/widget_tree.dart';
-import 'package:bhtapp/views/widgets/nav_items.dart';
 import 'package:flutter/material.dart';
+import 'package:rasadharma_app/data/notifiers.dart';
+import 'package:rasadharma_app/views/widgets/nav_items.dart';
 
 class NavbarWidget extends StatefulWidget {
   const NavbarWidget({super.key});

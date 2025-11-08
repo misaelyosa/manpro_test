@@ -1,6 +1,6 @@
-import 'package:bhtapp/views/widget_tree.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:rasadharma_app/views/widget_tree.dart';
 
 class WellcomePage extends StatefulWidget {
   const WellcomePage({super.key});
