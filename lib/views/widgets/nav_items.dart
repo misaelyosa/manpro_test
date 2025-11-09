@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rasadharma_app/theme/colors.dart';
 
 class NavItems extends StatefulWidget {
   const NavItems({
@@ -23,7 +24,7 @@ class _NavItemsState extends State<NavItems> {
   bool isPressed = false;
   @override
   Widget build(BuildContext context) {
-    Color activeColorBg = Colors.red;
+    Color activeColorBg = AppColors.darkRed;
     Color inactiveColorBg = Colors.white;
     Color inactiveColor = Colors.grey;
     Color activeColor = Colors.white;

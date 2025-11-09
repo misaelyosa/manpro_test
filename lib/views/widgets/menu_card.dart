@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rasadharma_app/theme/colors.dart';
 
 class MenuCard extends StatefulWidget {
   const MenuCard({
@@ -22,7 +23,7 @@ class _MenuCardState extends State<MenuCard> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: Colors.white,
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
         onTap: widget.onTap,
@@ -47,14 +48,10 @@ class _MenuCardState extends State<MenuCard> {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: Colors.amber[200],
+                    color: AppColors.cream,
                     borderRadius: BorderRadius.circular(50),
                   ),
-                  child: Icon(
-                    widget.icon,
-                    color: Colors.red.shade700,
-                    size: 28,
-                  ),
+                  child: Icon(widget.icon, color: AppColors.darkRed, size: 28),
                 ),
                 SizedBox(height: 12),
                 Text(
@@ -62,7 +59,7 @@ class _MenuCardState extends State<MenuCard> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.red,
+                    color: AppColors.darkRed,
                   ),
                   textAlign: TextAlign.center,
                 ),

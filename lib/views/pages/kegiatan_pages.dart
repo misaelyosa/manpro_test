@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rasadharma_app/data/classes/Events.dart';
+import 'package:rasadharma_app/theme/colors.dart';
 import 'package:rasadharma_app/views/widgets/events_card.dart';
 import 'package:rasadharma_app/views/widgets/segmented_control.dart';
 
@@ -62,7 +63,7 @@ class _KegiatanPagesState extends State<KegiatanPages> {
     final items = _selectedIndex == 0 ? _upcoming : _past;
 
     return Scaffold(
-      backgroundColor: Colors.yellow[50],
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         centerTitle: true,
         title: const Padding(
@@ -72,12 +73,12 @@ class _KegiatanPagesState extends State<KegiatanPages> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.red,
+              color: AppColors.darkRed,
             ),
           ),
         ),
         backgroundColor: Colors.white,
-        foregroundColor: Colors.red,
+        foregroundColor: AppColors.darkRed,
         elevation: 0.5,
       ),
       body: SafeArea(
