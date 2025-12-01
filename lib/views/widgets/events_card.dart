@@ -3,7 +3,7 @@ import 'package:rasadharma_app/data/classes/Events.dart';
 
 class EventsCard extends StatefulWidget {
   const EventsCard({super.key, required this.event, this.onRegister});
-  final Event event;
+  final Kegiatan event;
   final VoidCallback? onRegister;
 
   @override

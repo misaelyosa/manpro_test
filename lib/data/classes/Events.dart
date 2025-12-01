@@ -1,7 +1,7 @@
 // import 'package:flutter/material.dart';
 
 // Simple event model
-class Event {
+class Kegiatan {
   final String id;
   final String category; // e.g. 'Budaya', 'Sosial'
   final String title;
@@ -12,7 +12,7 @@ class Event {
   final int registered;
   final int capacity;
 
-  Event({
+  Kegiatan({
     required this.id,
     required this.category,
     required this.title,
