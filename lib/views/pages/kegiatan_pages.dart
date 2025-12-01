@@ -54,7 +54,7 @@ Widget _body(KegiatanProvider prov) {
           const SizedBox(height: 12),
 
           // Expanded agar ListView mengisi sisa layar dan bisa scroll sendiri
-          Expanded(
+          prov.fetchingKegiatan ? CircularProgressIndicator() : Expanded(
             child: prov.items.isEmpty
                 ? Center(
                     child: Text(

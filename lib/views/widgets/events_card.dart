@@ -13,9 +13,9 @@ class EventsCard extends StatefulWidget {
 class _EventsCardState extends State<EventsCard> {
   @override
   Widget build(BuildContext context) {
-    final persen = ((widget.event.registered / widget.event.capacity) * 100)
+    final persen = ((widget.event.registeredAmount / widget.event.capacity) * 100)
         .round();
-    final isFull = widget.event.registered >= widget.event.capacity;
+    final isFull = widget.event.registeredAmount >= widget.event.capacity;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -30,7 +30,7 @@ class _EventsCardState extends State<EventsCard> {
         children: [
           Row(
             children: [
-              _categoryBadge(widget.event.category),
+              _categoryBadge(widget.event.kategori),
               Spacer(),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -43,7 +43,7 @@ class _EventsCardState extends State<EventsCard> {
                     Icon(Icons.person),
                     SizedBox(width: 6),
                     Text(
-                      '${widget.event.registered}/${widget.event.capacity}',
+                      '${widget.event.registeredAmount}/${widget.event.capacity}',
 
                       style: const TextStyle(
                         fontSize: 12,
@@ -57,7 +57,7 @@ class _EventsCardState extends State<EventsCard> {
           ),
           SizedBox(height: 8),
           Text(
-            widget.event.title,
+            widget.event.namaKegiatan,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -70,7 +70,7 @@ class _EventsCardState extends State<EventsCard> {
               Icon(Icons.calendar_today, size: 16, color: Colors.redAccent),
               SizedBox(width: 8),
               Text(
-                _formatDate(widget.event.date),
+                _formatDate(widget.event.tanggalKegiatan),
                 // style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ],
@@ -81,7 +81,7 @@ class _EventsCardState extends State<EventsCard> {
               Icon(Icons.schedule, size: 16, color: Colors.redAccent),
               SizedBox(width: 8),
               Text(
-                widget.event.timeStr,
+                "${widget.event.waktuMulai} - ${widget.event.waktuSelesai}",
                 // style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ],
@@ -91,12 +91,12 @@ class _EventsCardState extends State<EventsCard> {
             children: [
               Icon(Icons.location_on, size: 16, color: Colors.redAccent),
               SizedBox(width: 8),
-              Expanded(child: Text(widget.event.location)),
+              Expanded(child: Text(widget.event.lokasi)),
             ],
           ),
           const SizedBox(height: 10),
           Text(
-            widget.event.description,
+            widget.event.deskripsi,
             style: const TextStyle(fontSize: 13, color: Colors.black54),
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
