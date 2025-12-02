@@ -23,6 +23,23 @@ class _WellcomePageState extends State<WellcomePage> {
               SizedBox(height: 20),
               Text('Welcome to Rasa Dharma App'),
               SizedBox(height: 20),
+              TextField(
+                decoration: InputDecoration(
+                  hintText: 'Email',
+                  labelText: 'Email',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextField(
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: 'Password',
+                  labelText: 'Password',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pushReplacement(
@@ -38,6 +55,23 @@ class _WellcomePageState extends State<WellcomePage> {
                   backgroundColor: Colors.amber[200],
                 ),
                 child: Text('Start', style: TextStyle(fontSize: 20)),
+              ),
+
+              SizedBox(height: 10),
+              Text("or"),
+              SizedBox(height: 10),
+              TextButton(
+                onPressed: (() {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return WidgetTree();
+                      },
+                    ),
+                  );
+                }),
+                child: Text("Log In as Guest"),
               ),
             ],
           ),
