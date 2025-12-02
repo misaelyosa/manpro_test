@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "140513486227",
+    "project_id": "bhtapp-ab3ac",
+    "storage_bucket": "bhtapp-ab3ac.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:140513486227:android:d154abaca499adad66b466",
+        "android_client_info": {
+          "package_name": "com.example.bhtapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbdTClqe9zZVOYXyDq-iz-3dosDId69pY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:140513486227:android:9c58965fcda9962b66b466",
+        "android_client_info": {
+          "package_name": "com.example.rasadharma_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbdTClqe9zZVOYXyDq-iz-3dosDId69pY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
