@@ -70,7 +70,9 @@ class RegisterPage extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: formKey,
-            child: ListView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextFormField(
                   controller: emailController,
