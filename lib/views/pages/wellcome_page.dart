@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:rasadharma_app/controller/login_provider.dart';
+import 'package:rasadharma_app/views/pages/register_page.dart';
 import 'package:rasadharma_app/views/widget_tree.dart';
 
 class WellcomePage extends StatelessWidget {
@@ -44,38 +45,58 @@ class WellcomePage extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return WidgetTree();
-                            },
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return WidgetTree();
+                                },
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber[200],
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amber[200],
-                      ),
-                      child: Text('Start', style: TextStyle(fontSize: 20)),
+                          child: Text('Login', style: TextStyle(fontSize: 20)),
+                        ),
+
+                        SizedBox(height: 10),
+                        Text("or"),
+                        SizedBox(height: 10),
+                        TextButton(
+                          onPressed: (() {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return WidgetTree();
+                                },
+                              ),
+                            );
+                          }),
+                          child: Text("Log In as Guest"),
+                        ),
+                      ],
                     ),
 
                     SizedBox(height: 10),
-                    Text("or"),
-                    SizedBox(height: 10),
                     TextButton(
                       onPressed: (() {
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return WidgetTree();
+                              return RegisterScreen();
                             },
                           ),
                         );
                       }),
-                      child: Text("Log In as Guest"),
+                      child: Text("Register New Account"),
                     ),
                   ],
                 ),
