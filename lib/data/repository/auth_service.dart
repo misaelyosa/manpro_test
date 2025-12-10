@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rasadharma_app/data/enums/collection_enums.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final CollectionReference _userCollection = FirebaseFirestore.instance.collection(CollectionEnums.user);
 
   /// Register new user
   Future<User?> registerWithEmail(String email, String password) async {
@@ -14,6 +17,16 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       throw e.message ?? "Registration failed";
     }
+  }
+
+  void addUserToCollection(String uid, String email, String nama, String noTelp, String role){
+    _userCollection.doc(uid).set({
+      'id': uid,
+      'email': email,
+      'nama': nama,
+      'no_telp': noTelp,
+      'role': role,
+    });
   }
 
   /// Login existing user
