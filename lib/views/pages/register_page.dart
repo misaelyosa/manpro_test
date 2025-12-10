@@ -24,7 +24,7 @@ class RegisterPage extends StatelessWidget {
   final VoidCallback onRegister;
 
   const RegisterPage({
-    Key? key,
+    super.key,
     required this.formKey,
     required this.emailController,
     required this.namaController,
@@ -34,7 +34,7 @@ class RegisterPage extends StatelessWidget {
     required this.obscurePassword,
     required this.obscureConfirmPassword,
     required this.onRegister,
-  }) : super(key: key);
+  });
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) return "Email wajib diisi";
@@ -55,8 +55,9 @@ class RegisterPage extends StatelessWidget {
   }
 
   String? _validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty)
+    if (value == null || value.isEmpty) {
       return "Konfirmasi password wajib diisi";
+    }
     if (value != passwordController.text) return "Password tidak cocok";
     return null;
   }
@@ -166,7 +167,7 @@ class RegisterPage extends StatelessWidget {
 
 /// === Contoh parent yang meng-hold state (controllers & value notifiers) ===
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();

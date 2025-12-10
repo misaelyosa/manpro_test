@@ -5,6 +5,10 @@ import 'package:rasadharma_app/views/pages/donasi_page.dart';
 import 'package:rasadharma_app/views/pages/kegiatan_pages.dart';
 import 'package:rasadharma_app/views/pages/kontak_page.dart';
 import 'package:rasadharma_app/views/pages/sejarah_page.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+
+final String apiKey = "6BivGVvK7AG4WaUUsHMg";
 
 class MorePages extends StatefulWidget {
   const MorePages({super.key});
@@ -14,6 +18,10 @@ class MorePages extends StatefulWidget {
 }
 
 class _MorePagesState extends State<MorePages> {
+  final String name = "Eric Yoel";
+  final String email = "pootisspy931@gmail.com";
+  final String phone = "62895399852711";
+  final String event = "Baca buku smeakin sehat";
   final List<Map<String, Object>> menuItems = const [
     {"icon": Icons.history, "label": "Sejarah", "page": SejarahPage()},
     {"icon": Icons.event, "label": "Kegiatan", "page": KegiatanPages()},
@@ -112,6 +120,22 @@ class _MorePagesState extends State<MorePages> {
                       // TODO: navigasi ke halaman pengaturan jika ada
                     },
                   ),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.settings,
+                      color: AppColors.primary,
+                    ),
+                    title: const Text("Send Whatsapp Messages"),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () async {
+                      await sendWaFonnte(
+                        adminPhone: '6281234567890', // ganti dengan nomor admin
+                        message:
+                            "Ada pendaftar baru:\nNama: ${name}\nEmail: ${email}\nNomor Whatsapp: ${phone}\nSaya mendaftar untuk event : ${event}",
+                      );
+                      // TODO: navigasi ke halaman pengaturan jika ada
+                    },
+                  ),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -121,4 +145,21 @@ class _MorePagesState extends State<MorePages> {
       ),
     );
   }
+}
+
+Future<void> sendWaFonnte({
+  required String adminPhone,
+  required String message,
+}) async {
+  final url = Uri.parse('https://api.fonnte.com/send');
+  const token = '6BivGVvK7AG4WaUUsHMg'; // Masukkan token Fonnte Anda
+
+  final response = await http.post(
+    url,
+    headers: {'Authorization': token},
+    body: {'target': adminPhone, 'message': message},
+  );
+
+  print("Status: ${response.statusCode}");
+  print("Response: ${response.body}");
 }

@@ -115,6 +115,5 @@ class _DetailDonasiPageState extends State<DetailDonasiPage> {
         ),
       ),
     );
-    ;
   }
 }

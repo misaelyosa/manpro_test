@@ -152,6 +152,5 @@ class _SejarahPageState extends State<SejarahPage> {
         ],
       ),
     );
-    ;
   }
 }

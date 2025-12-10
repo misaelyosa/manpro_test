@@ -25,7 +25,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, String>> _recentActivities = [
+    final List<Map<String, String>> recentActivities = [
       {
         "title": "Seminar Toleransi",
         "desc": "Diskusi tentang kerukunan antar umat beragama...",
@@ -283,9 +283,9 @@ class _HomePageState extends State<HomePage> {
                     onPageChanged: (index) {
                       setState(() => _currentPage = index);
                     },
-                    itemCount: _recentActivities.length,
+                    itemCount: recentActivities.length,
                     itemBuilder: (context, index) {
-                      final Map<String, String> a = _recentActivities[index];
+                      final Map<String, String> a = recentActivities[index];
                       return AnimatedBuilder(
                         animation: _pageController,
                         builder: (context, child) {
@@ -299,8 +299,7 @@ class _HomePageState extends State<HomePage> {
                           }
 
                           double diff = (pageValue - index).abs();
-                          double scale =
-                              (1 - (diff * 0.2)).clamp(0.8, 1.0) as double;
+                          double scale = (1 - (diff * 0.2)).clamp(0.8, 1.0);
 
                           return Transform.scale(
                             scale: scale,
@@ -352,7 +351,7 @@ class _HomePageState extends State<HomePage> {
                 // Carousel Indicators
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(_recentActivities.length, (index) {
+                  children: List.generate(recentActivities.length, (index) {
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 4),
                       width: _currentPage == index ? 12 : 8,
