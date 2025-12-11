@@ -129,7 +129,7 @@ class _MorePagesState extends State<MorePages> {
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () async {
                       await sendWaFonnte(
-                        adminPhone: '628999990508', // ganti dengan nomor admin
+                        adminPhone: '62895399852711',
                         message:
                             "Ada pendaftar baru:\nNama: ${name}\nEmail: ${email}\nNomor Whatsapp: ${phone}\nSaya mendaftar untuk event : ${event}",
                       );

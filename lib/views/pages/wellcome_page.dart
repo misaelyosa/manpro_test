@@ -52,7 +52,7 @@ class WellcomePage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.amber[200],
                     ),
-                    child: Text('Start', style: TextStyle(fontSize: 20)),
+                    child: Text('Login', style: TextStyle(fontSize: 20)),
                   ),
 
                   SizedBox(height: 10),
