@@ -1,18 +1,18 @@
-class User {
+class UserBHT {
   final String id;
   final String nama;
   final String email;
   final String noTelp;
 
-  User({
+  UserBHT({
     required this.id,
     required this.nama,
     required this.email,
     required this.noTelp,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory UserBHT.fromJson(Map<String, dynamic> json) {
+    return UserBHT(
       id: json['id'],
       nama: json['nama'],
       email: json['email'],

@@ -43,15 +43,7 @@ class WellcomePage extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => WidgetTree()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber[200],
-                    ),
+                    onPressed: prov.login,
                     child: Text('Login', style: TextStyle(fontSize: 20)),
                   ),
 
