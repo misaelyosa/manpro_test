@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rasadharma_app/data/classes/Events.dart';
+import 'package:rasadharma_app/views/pages/detail_kegiatan.dart';
 
 class EventsCard extends StatefulWidget {
   const EventsCard({
@@ -7,11 +8,13 @@ class EventsCard extends StatefulWidget {
     required this.event,
     required this.isRegistered,
     this.onRegister,
+    this.isadmin,
   });
 
   final Kegiatan event;
   final bool isRegistered;
   final VoidCallback? onRegister;
+  final bool? isadmin;
 
   @override
   State<EventsCard> createState() => _EventsCardState();
@@ -176,6 +179,52 @@ class _EventsCardState extends State<EventsCard> {
               ),
             ),
           ),
+
+          /// ADMIN DETAIL BUTTON (only for admins)
+          if (widget.isadmin == true) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailKegiatan(
+                        kegiatan: widget.event,
+                        isAdmin: widget.isadmin ?? false,
+                      ),
+                    ),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.red),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Detail Kegiatan',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Icon(
+                      Icons.admin_panel_settings,
+                      color: Colors.red,
+                      size: 18,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

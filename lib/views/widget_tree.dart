@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rasadharma_app/controller/kegiatan_provider.dart';
 import 'package:rasadharma_app/data/notifiers.dart';
 import 'package:rasadharma_app/views/pages/donasi_page.dart';
 import 'package:rasadharma_app/views/pages/home_page.dart';
@@ -27,15 +29,22 @@ class _WidgetTreeState extends State<WidgetTree> {
   Widget build(BuildContext context) {
     var currIndex = 0;
 
-    return Scaffold(
-      // Update the state of the app.
-      body: ValueListenableBuilder(
-        valueListenable: selectedPage,
-        builder: (context, value, child) {
-          return pages.elementAt(value);
-        },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => KegiatanProvider.withContext(context),
+        ),
+      ],
+      child: Scaffold(
+        // Update the state of the app.
+        body: ValueListenableBuilder(
+          valueListenable: selectedPage,
+          builder: (context, value, child) {
+            return pages.elementAt(value);
+          },
+        ),
+        bottomNavigationBar: NavbarWidget(),
       ),
-      bottomNavigationBar: NavbarWidget(),
     );
   }
 }

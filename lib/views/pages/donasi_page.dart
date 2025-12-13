@@ -116,8 +116,10 @@ class _DonasiPageState extends State<DonasiPage> {
                 ),
                 SizedBox(height: 10),
                 Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    alignment: WrapAlignment.center,
                     children: const [
                       DampakCard(
                         title: "1200+",

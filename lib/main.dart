@@ -1,5 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rasadharma_app/controller/kegiatan_provider.dart';
 import 'package:rasadharma_app/firebase_options.dart';
 import 'package:rasadharma_app/views/pages/wellcome_page.dart';
 
@@ -29,14 +31,20 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primaryColor: Colors.amber[100],
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => KegiatanProvider.withContext(context),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          brightness: Brightness.light,
+          primaryColor: Colors.amber[100],
+        ),
+        home: SafeArea(child: Scaffold(body: WellcomePage())),
       ),
-      home: SafeArea(child: Scaffold(body: WellcomePage())),
     );
   }
 }

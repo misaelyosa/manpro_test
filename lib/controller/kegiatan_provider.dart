@@ -3,10 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:rasadharma_app/data/classes/Events.dart';
 import 'package:rasadharma_app/data/classes/user.dart';
+import 'package:rasadharma_app/data/enums/collection_enums.dart';
 import 'package:rasadharma_app/data/enums/pref_keys_enums.dart';
 import 'package:rasadharma_app/data/repository/auth_service.dart';
 import 'package:rasadharma_app/data/repository/kegiatan_repo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class RegisteredUser {
+  final String userId;
+  final String nama;
+  final String email;
+  final String noTelp;
+  final DateTime registeredAt;
+
+  RegisteredUser({
+    required this.userId,
+    required this.nama,
+    required this.email,
+    required this.noTelp,
+    required this.registeredAt,
+  });
+}
 
 class KegiatanProvider extends ChangeNotifier {
   BuildContext? _context;
@@ -172,7 +189,7 @@ class KegiatanProvider extends ChangeNotifier {
       ScaffoldMessenger.of(_context!).showSnackBar(
         SnackBar(content: Text("Berhasil daftar ${e.namaKegiatan}")),
       );
-
+      await getKegiatan();
       notifyListeners();
     } catch (e) {
       ScaffoldMessenger.of(
@@ -196,5 +213,93 @@ class KegiatanProvider extends ChangeNotifier {
 
     print("Status: ${response.statusCode}");
     print("Response: ${response.body}");
+  }
+
+  Future<void> createKegiatan({
+    required String namaKegiatan,
+    required String kategori,
+    required DateTime tanggalKegiatan,
+    required String waktuMulai,
+    required String waktuSelesai,
+    required String lokasi,
+    required String deskripsi,
+    required int capacity,
+  }) async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+      final kegiatanRef = firestore.collection('kegiatan').doc();
+
+      final kegiatan = Kegiatan(
+        id: kegiatanRef.id,
+        namaKegiatan: namaKegiatan,
+        kategori: kategori,
+        tanggalKegiatan: tanggalKegiatan,
+        waktuMulai: waktuMulai,
+        waktuSelesai: waktuSelesai,
+        lokasi: lokasi,
+        deskripsi: deskripsi,
+        registeredAmount: 0,
+        capacity: capacity,
+      );
+
+      await kegiatanRef.set(kegiatan.toJson());
+
+      // Refresh the list
+      await getKegiatan();
+
+      ScaffoldMessenger.of(_context!).showSnackBar(
+        SnackBar(
+          content: Text('Kegiatan "$namaKegiatan" berhasil ditambahkan'),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        _context!,
+      ).showSnackBar(SnackBar(content: Text('Gagal menambahkan kegiatan: $e')));
+    }
+  }
+
+  Future<List<RegisteredUser>> getRegisteredUsers(String kegiatanId) async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+      final registrationsRef = firestore
+          .collection('kegiatan')
+          .doc(kegiatanId)
+          .collection('registrations');
+
+      final querySnapshot = await registrationsRef.get();
+
+      List<RegisteredUser> registeredUsers = [];
+
+      for (var doc in querySnapshot.docs) {
+        final userId = doc.id;
+        final registeredAt = (doc['registeredAt'] as Timestamp).toDate();
+
+        // Get user details from users collection
+        final userDoc = await firestore
+            .collection(CollectionEnums.user)
+            .doc(userId)
+            .get();
+        if (userDoc.exists) {
+          final userData = userDoc.data()!;
+          registeredUsers.add(
+            RegisteredUser(
+              userId: userId,
+              nama: userData['nama'] ?? '',
+              email: userData['email'] ?? '',
+              noTelp: userData['noTelp'] ?? '',
+              registeredAt: registeredAt,
+            ),
+          );
+        }
+      }
+
+      // Sort by registration date (newest first)
+      registeredUsers.sort((a, b) => b.registeredAt.compareTo(a.registeredAt));
+      print(registeredUsers);
+      return registeredUsers;
+    } catch (e) {
+      throw Exception('Gagal memuat daftar pengguna: $e');
+    }
   }
 }
