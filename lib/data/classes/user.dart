@@ -3,12 +3,14 @@ class UserBHT {
   final String nama;
   final String email;
   final String noTelp;
+  final String role;
 
   UserBHT({
     required this.id,
     required this.nama,
     required this.email,
     required this.noTelp,
+    required this.role,
   });
 
   factory UserBHT.fromJson(Map<String, dynamic> json) {
@@ -17,6 +19,7 @@ class UserBHT {
       nama: json['nama'],
       email: json['email'],
       noTelp: json['noTelp'],
+      role: json['role']
     );
   }
 
@@ -25,7 +28,8 @@ class UserBHT {
      'id': id,
      'nama': nama,
      'email': email,
-     'noTelp': noTelp
+     'noTelp': noTelp,
+     'role': role,
      };
   }
 }

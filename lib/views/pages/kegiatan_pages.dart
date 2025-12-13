@@ -52,6 +52,41 @@ Widget _body(KegiatanProvider prov) {
             onSelected: (i) => prov.onSelected(i),
           ),
           const SizedBox(height: 12),
+          if (prov.isAdmin) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  // TODO: navigate to create event page
+                  // Navigator.push(...)
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade700,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Text(
+                      'Tambah Kegiatan',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Icon(Icons.add, color: Colors.white, size: 18),
+                  ],
+                ),
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 12),
 
           // Expanded agar ListView mengisi sisa layar dan bisa scroll sendiri
           prov.fetchingKegiatan
