@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:rasadharma_app/data/classes/history.dart';
 import 'package:rasadharma_app/data/repository/sejarah_repo.dart';
-import 'package:rasadharma_app/theme/colors.dart';
 
 class SejarahProvider extends ChangeNotifier {
   BuildContext? _context;

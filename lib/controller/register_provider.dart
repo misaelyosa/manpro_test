@@ -36,7 +36,7 @@ class RegisterProvider extends ChangeNotifier {
       _confirmPasswordController;
 
     
-  final AuthService _auth = new AuthService();
+  final AuthService _auth = AuthService();
   // ===========================
   // VALIDATIONS
   // ===========================
