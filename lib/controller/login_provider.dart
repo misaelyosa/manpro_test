@@ -8,11 +8,23 @@ class LoginProvider extends ChangeNotifier {
   BuildContext? _context;
   LoginProvider.withContext(BuildContext context) {
     _context = context;
+    checkAlreadyLoggedIn();
   }
 
   final AuthService _auth = AuthService();
   final TextEditingController loginEmailController = TextEditingController();
   final TextEditingController loginPasswordController = TextEditingController();
+
+  Future<void> checkAlreadyLoggedIn() async {
+    final user = await _auth.getLoggedUser();
+
+    if (user != null && _context != null) {
+      Navigator.pushReplacement(
+        _context!,
+        MaterialPageRoute(builder: (_) => WidgetTree()),
+      );
+    }
+  }
 
   Future<void> login() async {
     try {
