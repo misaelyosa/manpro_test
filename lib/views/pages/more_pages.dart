@@ -5,7 +5,6 @@ import 'package:rasadharma_app/views/pages/donasi_page.dart';
 import 'package:rasadharma_app/views/pages/kegiatan_pages.dart';
 import 'package:rasadharma_app/views/pages/kontak_page.dart';
 import 'package:rasadharma_app/views/pages/sejarah_page.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
 final String apiKey = "6BivGVvK7AG4WaUUsHMg";

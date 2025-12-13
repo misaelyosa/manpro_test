@@ -5,7 +5,7 @@ import 'package:rasadharma_app/theme/colors.dart';
 import 'package:lottie/lottie.dart';
 
 class RegisterPage extends StatelessWidget {
-  RegisterPage({super.key});
+  const RegisterPage({super.key});
 
   @override
   Widget build(BuildContext context) {

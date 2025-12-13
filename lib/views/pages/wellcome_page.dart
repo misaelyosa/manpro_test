@@ -7,7 +7,7 @@ import 'package:rasadharma_app/views/pages/register_page.dart';
 import 'package:rasadharma_app/views/widget_tree.dart';
 
 class WellcomePage extends StatelessWidget {
-  WellcomePage({super.key});
+  const WellcomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
