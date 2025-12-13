@@ -13,6 +13,7 @@ class KegiatanProvider extends ChangeNotifier {
   KegiatanProvider.withContext(BuildContext context) {
     _context = context;
     getKegiatan();
+    checkAdmin();
   }
 
   final KegiatanRepo _repositoryKegiatan = KegiatanRepo();
@@ -22,6 +23,7 @@ class KegiatanProvider extends ChangeNotifier {
   List<Kegiatan> items = [];
   bool fetchingKegiatan = false;
   bool _loaded = false;
+  bool isAdmin = false;
 
   final List<Kegiatan> events = [];
   final Map<String, bool> _registrationStatus = {};
@@ -37,6 +39,15 @@ class KegiatanProvider extends ChangeNotifier {
   Future<void> onSelected(int i) async {
     selectedIndex = i;
     items = selectedIndex == 0 ? upcoming : past;
+    notifyListeners();
+  }
+
+  Future<void> checkAdmin() async {
+    final user = await _auth.getLoggedUser();
+    if (user == null) return;
+
+    // adjust according to your user model
+    isAdmin = user.role == 'admin';
     notifyListeners();
   }
 

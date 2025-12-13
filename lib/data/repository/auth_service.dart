@@ -50,10 +50,11 @@ class AuthService {
         nama: doc['nama'],
         email: doc['email'],
         noTelp: doc['no_telp'],
+        role: doc['role'],
       );
       String userJson = jsonEncode(loggedUser.toJson());
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      
+
       await prefs.setString(PrefkeysEnums.loggedUser, userJson);
     } catch (e) {
       log("Error fetching user: $e");
@@ -84,8 +85,13 @@ class AuthService {
   }
 
   /// Logout
-  Future<void> signOut() async {
+  Future<void> logout() async {
+    // Firebase sign out
     await _auth.signOut();
+
+    // Clear local session
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
   }
 
   /// Stream for auth changes
