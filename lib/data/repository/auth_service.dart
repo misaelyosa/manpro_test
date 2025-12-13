@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rasadharma_app/data/classes/user.dart';
 import 'package:rasadharma_app/data/enums/collection_enums.dart';
+import 'package:rasadharma_app/data/enums/pref_keys_enums.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
@@ -52,10 +53,21 @@ class AuthService {
       );
       String userJson = jsonEncode(loggedUser.toJson());
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('loggedUser', userJson);
+      
+      await prefs.setString(PrefkeysEnums.loggedUser, userJson);
     } catch (e) {
       log("Error fetching user: $e");
     }
+  }
+
+  Future<UserBHT?> getLoggedUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString(PrefkeysEnums.loggedUser);
+
+    if (jsonString == null) return null;
+
+    final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+    return UserBHT.fromJson(jsonMap);
   }
 
   /// Login existing user
