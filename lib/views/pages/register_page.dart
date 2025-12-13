@@ -5,7 +5,7 @@ import 'package:rasadharma_app/theme/colors.dart';
 import 'package:lottie/lottie.dart';
 
 class RegisterPage extends StatelessWidget {
-  const RegisterPage({super.key});
+  RegisterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class RegisterPage extends StatelessWidget {
             ),
             body: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: EdgeInsets.symmetric(horizontal: 24.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -40,7 +40,7 @@ class RegisterPage extends StatelessWidget {
                       height: 200,
                       width: 200,
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     // Register Title
                     Text(
                       'Create Your Account',
@@ -51,7 +51,7 @@ class RegisterPage extends StatelessWidget {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 40),
+                    SizedBox(height: 40),
                     // Register Card
                     Card(
                       elevation: 8,
@@ -60,7 +60,7 @@ class RegisterPage extends StatelessWidget {
                       ),
                       color: AppColors.white,
                       child: Padding(
-                        padding: const EdgeInsets.all(24.0),
+                        padding: EdgeInsets.all(24.0),
                         child: Form(
                           key: prov.formKey,
                           child: Column(
@@ -95,7 +95,7 @@ class RegisterPage extends StatelessWidget {
                                 ),
                                 validator: prov.validateEmail,
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16),
                               // Name Field
                               TextFormField(
                                 controller: prov.namaController,
@@ -127,7 +127,7 @@ class RegisterPage extends StatelessWidget {
                                 validator: (v) =>
                                     prov.validateNotEmpty(v, "Nama"),
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16),
                               // Phone Field
                               TextFormField(
                                 controller: prov.noTelpController,
@@ -159,7 +159,7 @@ class RegisterPage extends StatelessWidget {
                                 validator: (v) =>
                                     prov.validateNotEmpty(v, "No. Telepon"),
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16),
                               // Password Field
                               ValueListenableBuilder<bool>(
                                 valueListenable: prov.obscurePassword,
@@ -207,7 +207,7 @@ class RegisterPage extends StatelessWidget {
                                   );
                                 },
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16),
                               // Confirm Password Field
                               ValueListenableBuilder<bool>(
                                 valueListenable: prov.obscureConfirmPassword,
@@ -255,20 +255,20 @@ class RegisterPage extends StatelessWidget {
                                   );
                                 },
                               ),
-                              const SizedBox(height: 30),
+                              SizedBox(height: 30),
                               // Register Button
                               ElevatedButton(
                                 onPressed: prov.onRegister,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
                                   foregroundColor: AppColors.white,
-                                  minimumSize: const Size(double.infinity, 50),
+                                  minimumSize: Size(double.infinity, 50),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   elevation: 4,
                                 ),
-                                child: const Text(
+                                child: Text(
                                   "Register",
                                   style: TextStyle(
                                     fontSize: 18,

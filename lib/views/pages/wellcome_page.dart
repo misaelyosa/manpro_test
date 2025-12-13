@@ -7,7 +7,7 @@ import 'package:rasadharma_app/views/pages/register_page.dart';
 import 'package:rasadharma_app/views/widget_tree.dart';
 
 class WellcomePage extends StatelessWidget {
-  const WellcomePage({super.key});
+  WellcomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class WellcomePage extends StatelessWidget {
             body: SafeArea(
               child: Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  padding: EdgeInsets.symmetric(horizontal: 24.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -30,7 +30,7 @@ class WellcomePage extends StatelessWidget {
                         height: 350,
                         width: 350,
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
                       // Welcome Text
                       Text(
                         'Welcome to Rasa Dharma App',
@@ -41,7 +41,7 @@ class WellcomePage extends StatelessWidget {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 40),
+                      SizedBox(height: 40),
                       // Login Card
                       Card(
                         elevation: 8,
@@ -50,7 +50,7 @@ class WellcomePage extends StatelessWidget {
                         ),
                         color: AppColors.white,
                         child: Padding(
-                          padding: const EdgeInsets.all(24.0),
+                          padding: EdgeInsets.all(24.0),
                           child: Column(
                             children: [
                               // Email Field
@@ -83,7 +83,7 @@ class WellcomePage extends StatelessWidget {
                                   fillColor: AppColors.lightGray,
                                 ),
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20),
                               // Password Field
                               TextField(
                                 controller: prov.loginPasswordController,
@@ -115,20 +115,20 @@ class WellcomePage extends StatelessWidget {
                                   fillColor: AppColors.lightGray,
                                 ),
                               ),
-                              const SizedBox(height: 30),
+                              SizedBox(height: 30),
                               // Login Button
                               ElevatedButton(
                                 onPressed: prov.login,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
                                   foregroundColor: AppColors.white,
-                                  minimumSize: const Size(double.infinity, 50),
+                                  minimumSize: Size(double.infinity, 50),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   elevation: 4,
                                 ),
-                                child: const Text(
+                                child: Text(
                                   'Login',
                                   style: TextStyle(
                                     fontSize: 18,
@@ -140,7 +140,7 @@ class WellcomePage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
                       // Guest Login
                       TextButton(
                         onPressed: () {
@@ -153,14 +153,14 @@ class WellcomePage extends StatelessWidget {
                         },
                         style: TextButton.styleFrom(
                           foregroundColor: AppColors.primary,
-                          textStyle: const TextStyle(
+                          textStyle: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        child: const Text("Log In as Guest"),
+                        child: Text("Log In as Guest"),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       // Register
                       TextButton(
                         onPressed: () {
@@ -173,12 +173,12 @@ class WellcomePage extends StatelessWidget {
                         },
                         style: TextButton.styleFrom(
                           foregroundColor: AppColors.primary,
-                          textStyle: const TextStyle(
+                          textStyle: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        child: const Text("Register New Account"),
+                        child: Text("Register New Account"),
                       ),
                     ],
                   ),
