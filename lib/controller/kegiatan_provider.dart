@@ -1,7 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:rasadharma_app/data/classes/Events.dart';
+import 'package:rasadharma_app/data/classes/user.dart';
+import 'package:rasadharma_app/data/enums/pref_keys_enums.dart';
+import 'package:rasadharma_app/data/repository/auth_service.dart';
 import 'package:rasadharma_app/data/repository/kegiatan_repo.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class KegiatanProvider extends ChangeNotifier {
   BuildContext? _context;
@@ -11,48 +16,14 @@ class KegiatanProvider extends ChangeNotifier {
   }
 
   final KegiatanRepo _repositoryKegiatan = KegiatanRepo();
+  final AuthService _auth = AuthService();
 
   int selectedIndex = 0;
   List<Kegiatan> items = [];
   bool fetchingKegiatan = false;
   bool _loaded = false;
 
-  final List<Kegiatan> events = [
-    // Kegiatan(
-    //   id: '1',
-    //   category: 'Budaya',
-    //   title: 'Perayaan Imlek 2025',
-    //   date: DateTime(2025, 1, 29),
-    //   timeStr: '19:00 - 22:00',
-    //   location: 'Gedung Utama Rasa Dharma',
-    //   description:
-    //       'Perayaan tahun baru Imlek dengan pertunjukan seni tradisional dan makan bersama.',
-    //   registered: 85,
-    //   capacity: 120,
-    // ),
-    // Kegiatan(
-    //   id: '2',
-    //   category: 'Sosial',
-    //   title: 'Bakti Sosial Bulanan',
-    //   date: DateTime(2025, 2, 15),
-    //   timeStr: '08:00 - 12:00',
-    //   location: 'Kelurahan Pancoran',
-    //   description: 'Kegiatan bakti sosial untuk membantu warga sekitar.',
-    //   registered: 32,
-    //   capacity: 50,
-    // ),
-    // Kegiatan(
-    //   id: '3',
-    //   category: 'Budaya',
-    //   title: 'Pertunjukan Barongsai',
-    //   date: DateTime(2024, 11, 10),
-    //   timeStr: '16:00 - 18:00',
-    //   location: 'Lapangan Depan',
-    //   description: 'Pertunjukan barongsai dalam rangka festival lokal.',
-    //   registered: 120,
-    //   capacity: 150,
-    // ),
-  ];
+  final List<Kegiatan> events = [];
 
   List<Kegiatan> get upcoming =>
       events.where((e) => e.tanggalKegiatan.isAfter(DateTime.now())).toList();
@@ -88,16 +59,65 @@ class KegiatanProvider extends ChangeNotifier {
         ),
       );
     }
-    items = selectedIndex == 0 ? upcoming : past; 
+    items = selectedIndex == 0 ? upcoming : past;
     fetchingKegiatan = false;
     _loaded = true;
     notifyListeners();
   }
 
-  void onRegister(Kegiatan e) {
+  Future<void> onRegister(Kegiatan e) async {
+    final UserBHT? user = await _auth.getLoggedUser();
+    if (user == null) {
+      ScaffoldMessenger.of(_context!).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Silahkan login terlebih dahulu untuk mendaftar kegiatan",
+          ),
+        ),
+      );
+      return; // STOP here
+    }
+    // Build message
+    final message =
+        '''
+        Ada pendaftar baru event 📢
+
+        Nama: ${user.nama}
+        Email: ${user.email}
+        No. WhatsApp: ${user.noTelp}
+
+        Detail Event:
+        Nama Event: ${e.namaKegiatan}
+        Kategori: ${e.kategori}
+        Tanggal: ${e.tanggalKegiatan.toLocal()}
+        Waktu: ${e.waktuMulai} - ${e.waktuSelesai}
+        Lokasi: ${e.lokasi}
+
+        Terima kasih 🙏
+        ''';
+
+    // Send WhatsApp
+    await sendWaFonnte(adminPhone: '62895399852711', message: message);
     ScaffoldMessenger.of(
       _context!,
     ).showSnackBar(SnackBar(content: Text("Daftar ke ${e.namaKegiatan}")));
     notifyListeners();
+  }
+
+  Future<void> sendWaFonnte({
+    required String adminPhone,
+    required String message,
+  }) async {
+    final url = Uri.parse('https://api.fonnte.com/send');
+    const token = '6BivGVvK7AG4WaUUsHMg'; // Masukkan token Fonnte Anda
+
+    final response = await http.post(
+      url,
+      headers: {'Authorization': token},
+      body: {'target': adminPhone, 'message': message},
+    );
+
+    print("Status: ${response.statusCode}");
+    print("Response: ${response.body}");
   }
 }

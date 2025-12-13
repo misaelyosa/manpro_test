@@ -26,6 +26,7 @@ class WellcomePage extends StatelessWidget {
                   Text('Welcome to Rasa Dharma App'),
                   SizedBox(height: 20),
                   TextField(
+                    controller: prov.loginEmailController,
                     decoration: InputDecoration(
                       hintText: 'Email',
                       labelText: 'Email',
@@ -34,6 +35,7 @@ class WellcomePage extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   TextField(
+                    controller: prov.loginPasswordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       hintText: 'Password',
