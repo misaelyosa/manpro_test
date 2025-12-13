@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:rasadharma_app/theme/colors.dart';
-import 'package:rasadharma_app/views/widgets/app_header.dart';
 
 class DetailDonasiPage extends StatefulWidget {
   const DetailDonasiPage({super.key, required this.money});

@@ -131,7 +131,7 @@ class _MorePagesState extends State<MorePages> {
                       await sendWaFonnte(
                         adminPhone: '62895399852711',
                         message:
-                            "Ada pendaftar baru:\nNama: ${name}\nEmail: ${email}\nNomor Whatsapp: ${phone}\nSaya mendaftar untuk event : ${event}",
+                            "Ada pendaftar baru:\nNama: $name\nEmail: $email\nNomor Whatsapp: $phone\nSaya mendaftar untuk event : $event",
                       );
                       // TODO: navigasi ke halaman pengaturan jika ada
                     },
