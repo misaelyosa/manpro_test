@@ -24,6 +24,9 @@ class KegiatanProvider extends ChangeNotifier {
   bool _loaded = false;
 
   final List<Kegiatan> events = [];
+  final Map<String, bool> _registrationStatus = {};
+
+  bool isRegistered(String eventId) => _registrationStatus[eventId] ?? false;
 
   List<Kegiatan> get upcoming =>
       events.where((e) => e.tanggalKegiatan.isAfter(DateTime.now())).toList();
@@ -65,6 +68,23 @@ class KegiatanProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> checkRegistrationStatus(String eventId) async {
+    final user = await _auth.getLoggedUser();
+    if (user == null) return;
+
+    if (_registrationStatus.containsKey(eventId)) return;
+
+    final doc = await FirebaseFirestore.instance
+        .collection('kegiatan')
+        .doc(eventId)
+        .collection('registrations')
+        .doc(user.id)
+        .get();
+
+    _registrationStatus[eventId] = doc.exists;
+    notifyListeners();
+  }
+
   Future<void> onRegister(Kegiatan e) async {
     final UserBHT? user = await _auth.getLoggedUser();
     if (user == null) {
@@ -75,33 +95,79 @@ class KegiatanProvider extends ChangeNotifier {
           ),
         ),
       );
-      return; // STOP here
+      return;
     }
-    // Build message
-    final message =
-        '''
-        Ada pendaftar baru event 📢
 
-        Nama: ${user.nama}
-        Email: ${user.email}
-        No. WhatsApp: ${user.noTelp}
+    final firestore = FirebaseFirestore.instance;
+    final kegiatanRef = firestore.collection('kegiatan').doc(e.id);
+    final registrationRef = kegiatanRef
+        .collection('registrations')
+        .doc(user.id);
 
-        Detail Event:
-        Nama Event: ${e.namaKegiatan}
-        Kategori: ${e.kategori}
-        Tanggal: ${e.tanggalKegiatan.toLocal()}
-        Waktu: ${e.waktuMulai} - ${e.waktuSelesai}
-        Lokasi: ${e.lokasi}
+    try {
+      await firestore.runTransaction((transaction) async {
+        final kegiatanSnap = await transaction.get(kegiatanRef);
 
-        Terima kasih 🙏
-        ''';
+        if (!kegiatanSnap.exists) {
+          throw Exception("Kegiatan tidak ditemukan");
+        }
 
-    // Send WhatsApp
-    await sendWaFonnte(adminPhone: '62895399852711', message: message);
-    ScaffoldMessenger.of(
-      _context!,
-    ).showSnackBar(SnackBar(content: Text("Daftar ke ${e.namaKegiatan}")));
-    notifyListeners();
+        final int currentCount = kegiatanSnap['registered_amount'] ?? 0;
+        final int capacity = kegiatanSnap['capacity'] ?? 0;
+
+        if (currentCount >= capacity) {
+          throw Exception("Kegiatan sudah penuh");
+        }
+
+        final registrationSnap = await transaction.get(registrationRef);
+        if (registrationSnap.exists) {
+          throw Exception("Anda sudah terdaftar di kegiatan ini");
+        }
+
+        // Create subcollection document
+        transaction.set(registrationRef, {
+          'registeredAt': FieldValue.serverTimestamp(),
+        });
+
+        // Update counter
+        transaction.update(kegiatanRef, {
+          'registered_amount': currentCount + 1,
+        });
+      });
+
+      // ===============================
+      // WhatsApp notification
+      // ===============================
+      final message =
+          '''
+            Ada pendaftar baru event 📢
+
+            Nama: ${user.nama}
+            Email: ${user.email}
+            No. WhatsApp: ${user.noTelp}
+
+            Detail Event:
+            Nama Event: ${e.namaKegiatan}
+            Kategori: ${e.kategori}
+            Tanggal: ${e.tanggalKegiatan.toLocal()}
+            Waktu: ${e.waktuMulai} - ${e.waktuSelesai}
+            Lokasi: ${e.lokasi}
+
+            Terima kasih 🙏
+            ''';
+
+      await sendWaFonnte(adminPhone: '6287855570801', message: message);
+
+      ScaffoldMessenger.of(_context!).showSnackBar(
+        SnackBar(content: Text("Berhasil daftar ${e.namaKegiatan}")),
+      );
+
+      notifyListeners();
+    } catch (e) {
+      ScaffoldMessenger.of(
+        _context!,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   Future<void> sendWaFonnte({
@@ -109,7 +175,7 @@ class KegiatanProvider extends ChangeNotifier {
     required String message,
   }) async {
     final url = Uri.parse('https://api.fonnte.com/send');
-    const token = '6BivGVvK7AG4WaUUsHMg'; // Masukkan token Fonnte Anda
+    const token = '6BivGVvK7AG4WaUUsHMg';
 
     final response = await http.post(
       url,

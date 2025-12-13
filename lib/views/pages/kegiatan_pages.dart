@@ -54,27 +54,36 @@ Widget _body(KegiatanProvider prov) {
           const SizedBox(height: 12),
 
           // Expanded agar ListView mengisi sisa layar dan bisa scroll sendiri
-          prov.fetchingKegiatan ? CircularProgressIndicator() : Expanded(
-            child: prov.items.isEmpty
-                ? Center(
-                    child: Text(
-                      'Tidak ada kegiatan',
-                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                    ),
-                  )
-                : ListView.separated(
-                    itemCount: prov.items.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final event = prov.items[index];
-                      return EventsCard(
-                        event: event,
-                        onRegister: () => prov.onRegister(event),
-                      );
-                    },
-                  ),
-          ),
+          prov.fetchingKegiatan
+              ? CircularProgressIndicator()
+              : Expanded(
+                  child: prov.items.isEmpty
+                      ? Center(
+                          child: Text(
+                            'Tidak ada kegiatan',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        )
+                      : ListView.separated(
+                          itemCount: prov.items.length,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 12),
+                          itemBuilder: (context, index) {
+                            final event = prov.items[index];
+                            prov.checkRegistrationStatus(event.id);
+                            return EventsCard(
+                              event: event,
+                              isRegistered: prov.isRegistered(event.id),
+                              onRegister: prov.isRegistered(event.id)
+                                  ? null
+                                  : () => prov.onRegister(event),
+                            );
+                          },
+                        ),
+                ),
         ],
       ),
     ),
