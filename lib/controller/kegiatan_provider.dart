@@ -30,7 +30,7 @@ class KegiatanProvider extends ChangeNotifier {
   KegiatanProvider.withContext(BuildContext context) {
     _context = context;
     getKegiatan();
-    checkAdmin();
+    checkAdmin(); 
   }
 
   final KegiatanRepo _repositoryKegiatan = KegiatanRepo();
@@ -39,7 +39,6 @@ class KegiatanProvider extends ChangeNotifier {
   int selectedIndex = 0;
   List<Kegiatan> items = [];
   bool fetchingKegiatan = false;
-  bool _loaded = false;
   bool isAdmin = false;
 
   final List<Kegiatan> events = [];
@@ -69,7 +68,6 @@ class KegiatanProvider extends ChangeNotifier {
   }
 
   Future<void> getKegiatan() async {
-    if (_loaded) return;
     fetchingKegiatan = true;
     notifyListeners();
     QuerySnapshot querySnapshot = await _repositoryKegiatan.getKegiatanStream();
@@ -92,7 +90,12 @@ class KegiatanProvider extends ChangeNotifier {
     }
     items = selectedIndex == 0 ? upcoming : past;
     fetchingKegiatan = false;
-    _loaded = true;
+    notifyListeners();
+  }
+
+  Future<void> deleteKegiatan(String eventId) async {
+    await _repositoryKegiatan.deleteKegiatan(eventId);
+    // await getKegiatan();
     notifyListeners();
   }
 
@@ -190,6 +193,7 @@ class KegiatanProvider extends ChangeNotifier {
         SnackBar(content: Text("Berhasil daftar ${e.namaKegiatan}")),
       );
       await getKegiatan();
+      _registrationStatus[e.id] = true;
       notifyListeners();
     } catch (e) {
       ScaffoldMessenger.of(
@@ -243,15 +247,14 @@ class KegiatanProvider extends ChangeNotifier {
       );
 
       await kegiatanRef.set(kegiatan.toJson());
-
-      // Refresh the list
-      await getKegiatan();
-
       ScaffoldMessenger.of(_context!).showSnackBar(
         SnackBar(
           content: Text('Kegiatan "$namaKegiatan" berhasil ditambahkan'),
         ),
       );
+      events.add(kegiatan);
+      items = selectedIndex == 0 ? upcoming : past;
+      notifyListeners();
     } catch (e) {
       ScaffoldMessenger.of(
         _context!,

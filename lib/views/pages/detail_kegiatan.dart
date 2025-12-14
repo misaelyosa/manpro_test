@@ -4,6 +4,7 @@ import 'package:rasadharma_app/controller/kegiatan_provider.dart';
 import 'package:rasadharma_app/data/classes/Events.dart';
 import 'package:rasadharma_app/theme/colors.dart';
 import 'package:csv/csv.dart';
+import 'package:rasadharma_app/views/pages/kegiatan_pages.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -411,12 +412,25 @@ class _DetailKegiatanState extends State<DetailKegiatan> {
             child: const Text('Batal'),
           ),
           TextButton(
-            onPressed: () {
-              // TODO: Implement delete functionality
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Fitur hapus akan segera hadir')),
-              );
+            onPressed: () async {
+              Navigator.pop(context); // tutup dialog dulu
+
+              try {
+                await prov.deleteKegiatan(widget.kegiatan.id);
+
+                if (!mounted) return;
+              } catch (e) {
+                if (!mounted) return;
+
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(e.toString())));
+              } finally {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const KegiatanPages()),
+                );
+              }
             },
             child: const Text('Hapus', style: TextStyle(color: Colors.red)),
           ),

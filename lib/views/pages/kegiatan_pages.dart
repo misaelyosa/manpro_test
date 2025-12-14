@@ -10,27 +10,33 @@ class KegiatanPages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final prov = Provider.of<KegiatanProvider>(context);
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
-            "Kegiatan",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.darkRed,
+    return ChangeNotifierProvider(
+      create: (_) => KegiatanProvider.withContext(context),
+      child: Consumer<KegiatanProvider>(
+        builder: (context, prov, _) {
+          return Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AppBar(
+              centerTitle: true,
+              title: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  "Kegiatan",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.darkRed,
+                  ),
+                ),
+              ),
+              backgroundColor: Colors.white,
+              foregroundColor: AppColors.darkRed,
+              elevation: 0.5,
             ),
-          ),
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.darkRed,
-        elevation: 0.5,
+            body: _body(context, prov),
+          );
+        },
       ),
-      body: _body(context, prov),
     );
   }
 }
