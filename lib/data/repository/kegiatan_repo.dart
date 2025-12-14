@@ -16,4 +16,34 @@ class KegiatanRepo {
       throw Exception('Gagal menghapus kegiatan: $e');
     }
   }
+
+  Future<void> updateKegiatan({
+    required String eventId,
+    required String namaKegiatan,
+    required String kategori,
+    required DateTime tanggalKegiatan,
+    required String waktuMulai,
+    required String waktuSelesai,
+    required String lokasi,
+    required String deskripsi,
+    required int capacity,
+  }) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('kegiatan')
+          .doc(eventId)
+          .update({
+            'nama_kegiatan': namaKegiatan,
+            'kategori': kategori,
+            'tanggal_kegiatan': Timestamp.fromDate(tanggalKegiatan),
+            'waktu_mulai': waktuMulai,
+            'waktu_selesai': waktuSelesai,
+            'lokasi': lokasi,
+            'deskripsi': deskripsi,
+            'capacity': capacity,
+          });
+    } catch (e) {
+      throw Exception('Gagal menghapus kegiatan: $e');
+    }
+  }
 }

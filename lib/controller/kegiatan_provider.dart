@@ -30,7 +30,7 @@ class KegiatanProvider extends ChangeNotifier {
   KegiatanProvider.withContext(BuildContext context) {
     _context = context;
     getKegiatan();
-    checkAdmin(); 
+    checkAdmin();
   }
 
   final KegiatanRepo _repositoryKegiatan = KegiatanRepo();
@@ -96,6 +96,50 @@ class KegiatanProvider extends ChangeNotifier {
   Future<void> deleteKegiatan(String eventId) async {
     await _repositoryKegiatan.deleteKegiatan(eventId);
     // await getKegiatan();
+    notifyListeners();
+  }
+
+  Future<void> updateKegiatan({
+    required String eventId,
+    required String namaKegiatan,
+    required String kategori,
+    required DateTime tanggalKegiatan,
+    required String waktuMulai,
+    required String waktuSelesai,
+    required String lokasi,
+    required String deskripsi,
+    required int capacity,
+  }) async {
+    _repositoryKegiatan.updateKegiatan(
+      eventId: eventId,
+      namaKegiatan: namaKegiatan,
+      kategori: kategori,
+      tanggalKegiatan: tanggalKegiatan,
+      waktuMulai: waktuMulai,
+      waktuSelesai: waktuSelesai,
+      lokasi: lokasi,
+      deskripsi: deskripsi,
+      capacity: capacity,
+    );
+    
+    // update local cache
+    final index = events.indexWhere((e) => e.id == eventId);
+    if (index != -1) {
+      events[index] = Kegiatan(
+        id: eventId,
+        namaKegiatan: namaKegiatan,
+        kategori: kategori,
+        tanggalKegiatan: tanggalKegiatan,
+        waktuMulai: waktuMulai,
+        waktuSelesai: waktuSelesai,
+        lokasi: lokasi,
+        deskripsi: deskripsi,
+        registeredAmount: events[index].registeredAmount,
+        capacity: capacity,
+      );
+    }
+
+    items = selectedIndex == 0 ? upcoming : past;
     notifyListeners();
   }
 

@@ -126,13 +126,16 @@ Widget _body(BuildContext context, KegiatanProvider prov) {
 void _showAddKegiatanModal(BuildContext context, KegiatanProvider prov) {
   final _formKey = GlobalKey<FormState>();
   final _namaController = TextEditingController();
-  final _kategoriController = TextEditingController();
   final _tanggalController = TextEditingController();
   final _waktuMulaiController = TextEditingController();
   final _waktuSelesaiController = TextEditingController();
   final _lokasiController = TextEditingController();
   final _deskripsiController = TextEditingController();
   final _capacityController = TextEditingController();
+
+  final List<String> kategoriList = ['Budaya', 'Non Budaya'];
+
+  String? selectedKategori;
 
   DateTime? _selectedDate;
 
@@ -179,16 +182,27 @@ void _showAddKegiatanModal(BuildContext context, KegiatanProvider prov) {
               const SizedBox(height: 12),
 
               // Kategori
-              TextFormField(
-                controller: _kategoriController,
+              DropdownButtonFormField<String>(
+                value: selectedKategori,
                 decoration: const InputDecoration(
                   labelText: 'Kategori',
                   border: OutlineInputBorder(),
-                  hintText: 'Contoh: Budaya, Sosial, dll',
                 ),
+                items: kategoriList
+                    .map(
+                      (kategori) => DropdownMenuItem<String>(
+                        value: kategori,
+                        child: Text(kategori),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  selectedKategori = value;
+                },
                 validator: (value) =>
-                    value?.isEmpty ?? true ? 'Kategori wajib diisi' : null,
+                    value == null ? 'Kategori wajib dipilih' : null,
               ),
+
               const SizedBox(height: 12),
 
               // Tanggal
@@ -318,7 +332,7 @@ void _showAddKegiatanModal(BuildContext context, KegiatanProvider prov) {
                         if (_formKey.currentState?.validate() ?? false) {
                           await prov.createKegiatan(
                             namaKegiatan: _namaController.text,
-                            kategori: _kategoriController.text,
+                            kategori: selectedKategori!,
                             tanggalKegiatan: _selectedDate!,
                             waktuMulai: _waktuMulaiController.text,
                             waktuSelesai: _waktuSelesaiController.text,

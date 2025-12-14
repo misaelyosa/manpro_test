@@ -394,9 +394,153 @@ class _DetailKegiatanState extends State<DetailKegiatan> {
   }
 
   void _showEditDialog(BuildContext context, KegiatanProvider prov) {
-    // TODO: Implement edit dialog
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Fitur edit akan segera hadir')),
+    final namaController = TextEditingController(
+      text: widget.kegiatan.namaKegiatan,
+    );
+    final lokasiController = TextEditingController(
+      text: widget.kegiatan.lokasi,
+    );
+    final deskripsiController = TextEditingController(
+      text: widget.kegiatan.deskripsi,
+    );
+    final capacityController = TextEditingController(
+      text: widget.kegiatan.capacity.toString(),
+    );
+    final waktuMulaiController = TextEditingController(
+      text: widget.kegiatan.waktuMulai,
+    );
+    final waktuSelesaiController = TextEditingController(
+      text: widget.kegiatan.waktuSelesai,
+    );
+
+    DateTime selectedDate = widget.kegiatan.tanggalKegiatan;
+    String selectedKategori = widget.kegiatan.kategori;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Edit Kegiatan'),
+              content: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: namaController,
+                      decoration: const InputDecoration(labelText: 'Nama'),
+                    ),
+                    const SizedBox(height: 8),
+
+                    DropdownButtonFormField<String>(
+                      initialValue: selectedKategori,
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'Budaya',
+                          child: Text('Budaya'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Non Budaya',
+                          child: Text('Non Budaya'),
+                        ),
+                      ],
+                      onChanged: (v) => setState(() => selectedKategori = v!),
+                      decoration: const InputDecoration(labelText: 'Kategori'),
+                    ),
+                    const SizedBox(height: 8),
+
+                    TextField(
+                      controller: lokasiController,
+                      decoration: const InputDecoration(labelText: 'Lokasi'),
+                    ),
+                    const SizedBox(height: 8),
+
+                    TextField(
+                      controller: waktuMulaiController,
+                      decoration: const InputDecoration(
+                        labelText: 'Waktu Mulai',
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    TextField(
+                      controller: waktuSelesaiController,
+                      decoration: const InputDecoration(
+                        labelText: 'Waktu Selesai',
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    TextField(
+                      controller: capacityController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'Kapasitas'),
+                    ),
+                    const SizedBox(height: 8),
+
+                    TextField(
+                      controller: deskripsiController,
+                      maxLines: 3,
+                      decoration: const InputDecoration(labelText: 'Deskripsi'),
+                    ),
+                    const SizedBox(height: 8),
+
+                    Row(
+                      children: [
+                        Text('Tanggal: ${_formatDate(selectedDate)}'),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () async {
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: selectedDate,
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime(2100),
+                            );
+                            if (picked != null) {
+                              setState(() => selectedDate = picked);
+                            }
+                          },
+                          child: const Text('Pilih'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('Batal'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await prov.updateKegiatan(
+                      eventId: widget.kegiatan.id,
+                      namaKegiatan: namaController.text.trim(),
+                      kategori: selectedKategori,
+                      tanggalKegiatan: selectedDate,
+                      waktuMulai: waktuMulaiController.text.trim(),
+                      waktuSelesai: waktuSelesaiController.text.trim(),
+                      lokasi: lokasiController.text.trim(),
+                      deskripsi: deskripsiController.text.trim(),
+                      capacity: int.parse(capacityController.text),
+                    );
+
+                    if (!mounted) return;
+                    Navigator.pop(dialogContext);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const KegiatanPages()),
+                    );
+                  },
+                  child: const Text('Simpan'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
