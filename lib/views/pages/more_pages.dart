@@ -1,5 +1,11 @@
+import 'dart:io';
+
+import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:media_store_plus/media_store_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rasadharma_app/data/repository/auth_service.dart';
 import 'package:rasadharma_app/theme/colors.dart';
 import 'package:rasadharma_app/views/pages/donasi_page.dart';
@@ -7,6 +13,7 @@ import 'package:rasadharma_app/views/pages/kegiatan_pages.dart';
 import 'package:rasadharma_app/views/pages/kontak_page.dart';
 import 'package:rasadharma_app/views/pages/sejarah_page.dart';
 import 'package:rasadharma_app/views/pages/wellcome_page.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
@@ -20,6 +27,20 @@ class MorePages extends StatefulWidget {
 }
 
 class _MorePagesState extends State<MorePages> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _initMediaStore();
+  }
+
+  Future<void> _initMediaStore() async {
+    if (Platform.isAndroid) {
+      await MediaStore.ensureInitialized();
+      MediaStore.appFolder = "Rasadharma";
+    }
+  }
+
   final String name = "Eric Yoel";
   final String email = "pootisspy931@gmail.com";
   final String phone = "62895399852711";
@@ -32,6 +53,14 @@ class _MorePagesState extends State<MorePages> {
   ];
 
   final AuthService _auth = AuthService();
+  List<List<dynamic>> _dummyData() {
+    return [
+      ["Nama", "Email", "No HP", "Event"],
+      [name, email, phone, event],
+      ["Budi", "budi@gmail.com", "628123456789", "Donasi Buku"],
+      ["Siti", "siti@gmail.com", "628987654321", "Kegiatan Sosial"],
+    ];
+  }
 
   Future<void> _logout(BuildContext context) async {
     await _auth.logout();
@@ -41,6 +70,36 @@ class _MorePagesState extends State<MorePages> {
       MaterialPageRoute(builder: (_) => WellcomePage()),
       (route) => false,
     );
+  }
+
+  Future<void> exportToCSVDownload() async {
+    try {
+      final csvData = const ListToCsvConverter().convert(_dummyData());
+
+      final mediaStore = MediaStore();
+
+      await mediaStore.saveFile(
+        tempFilePath: await _createTempCSV(csvData),
+        dirType: DirType.download,
+        dirName: DirName.download,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("CSV tersimpan di Download")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Gagal export CSV: $e")));
+    }
+  }
+
+  Future<String> _createTempCSV(String csvData) async {
+    final dir = await getTemporaryDirectory();
+    final path = '${dir.path}/data_testing.csv';
+    final file = File(path);
+    await file.writeAsString(csvData);
+    return path;
   }
 
   @override
@@ -167,6 +226,15 @@ class _MorePagesState extends State<MorePages> {
                         ),
                       ),
                     ),
+                  ),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.download,
+                      color: AppColors.primary,
+                    ),
+                    title: const Text("Export Data (CSV)"),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: exportToCSVDownload,
                   ),
                 ],
               ),
