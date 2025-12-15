@@ -1,80 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rasadharma_app/controller/contact_provider.dart';
+import 'package:rasadharma_app/data/classes/contact_person.dart';
 import 'package:rasadharma_app/theme/colors.dart';
 
-class KontakPage extends StatefulWidget {
+class KontakPage extends StatelessWidget {
   const KontakPage({super.key});
 
   @override
-  State<KontakPage> createState() => _KontakPageState();
-}
-
-class _KontakPageState extends State<KontakPage> {
-  final _formKey = GlobalKey<FormState>();
-  String _name = "";
-  String _email = "";
-  String _message = "";
-  bool _isSending = false;
-
-  void _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    _formKey.currentState!.save();
-
-    setState(() => _isSending = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isSending = false);
-
-    if (!mounted) return;
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Pesan Terkirim"),
-        content: const Text(
-          "Terima kasih atas pesan Anda. Kami akan segera membalas.",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text("OK"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  final List<Map<String, String>> _contactPersons = [
-    {
-      "name": "Budi Santoso",
-      "role": "Ketua Organisasi",
-      "time": "Senin - Jumat (09:00 - 17:00)",
-      "info": "Hubungi untuk kerjasama resmi dan surat menyurat.",
-    },
-    {
-      "name": "Lina Wijaya",
-      "role": "Koordinator Acara",
-      "time": "Selasa - Sabtu (10:00 - 18:00)",
-      "info": "Hubungi terkait kegiatan, acara, dan pendaftaran peserta.",
-    },
-    {
-      "name": "Hendra Gunawan",
-      "role": "Bendahara",
-      "time": "Senin - Kamis (08:00 - 16:00)",
-      "info": "Hubungi mengenai donasi, laporan keuangan, dan sponsor.",
-    },
-  ];
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.darkRed,
-        elevation: 0.5,
-        toolbarOpacity: 1,
-
-        centerTitle: true,
-        title: const Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
+    return ChangeNotifierProvider(
+      create: (_) => ContactProvider()..getContacts(),
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          foregroundColor: AppColors.darkRed,
+          centerTitle: true,
+          title: const Text(
             "Kontak",
             style: TextStyle(
               fontSize: 20,
@@ -83,210 +26,309 @@ class _KontakPageState extends State<KontakPage> {
             ),
           ),
         ),
+        body: Consumer<ContactProvider>(
+          builder: (context, prov, _) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _infoSection(),
+                  const SizedBox(height: 30),
+                  _contactPersonSection(context, prov),
+                ],
+              ),
+            );
+          },
+        ),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
+    );
+  }
+
+  Widget _infoSection() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            "Informasi Kontak",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.darkRed,
+            ),
+          ),
+          SizedBox(height: 10),
+          _InfoTile(
+            icon: Icons.phone,
+            title: "Telepon",
+            subtitle: "+62 812 3456 7890",
+          ),
+          _InfoTile(
+            icon: Icons.email,
+            title: "Email",
+            subtitle: "info@rasadharma.org",
+          ),
+          _InfoTile(
+            icon: Icons.location_on,
+            title: "Alamat",
+            subtitle: "Jl. Boen Hian Tong No. 10, Semarang",
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _contactPersonSection(BuildContext context, ContactProvider prov) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Kontak Person",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.darkRed,
+          ),
+        ),
+
+        if (prov.isAdmin) ...[
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => _showAddContactModal(context, prov),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade700,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Text(
+                    'Tambah Kontak',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(Icons.add, color: Colors.white, size: 18),
+                ],
+              ),
+            ),
+          ),
+        ],
+
+        const SizedBox(height: 12),
+
+        Column(
+          children: prov.contacts.map((person) {
+            return Card(
+              color: AppColors.white,
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                title: Text(
+                  person.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.darkRed,
+                  ),
+                ),
+                subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Section: Informasi Kontak
-                    const Text(
-                      "Informasi Kontak",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.darkRed,
+                    Text(person.role),
+                    const SizedBox(height: 4),
+                    Text(person.time, style: const TextStyle(fontSize: 12)),
+                    const SizedBox(height: 4),
+                    Text(person.info, style: const TextStyle(fontSize: 12)),
+                  ],
+                ),
+                trailing: prov.isAdmin
+                    ? IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => prov.deleteContact(person.id),
+                      )
+                    : null,
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+void _showAddContactModal(BuildContext context, ContactProvider prov) {
+  final _formKey = GlobalKey<FormState>();
+
+  final _nameController = TextEditingController();
+  final _roleController = TextEditingController();
+  final _timeController = TextEditingController();
+  final _infoController = TextEditingController();
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      return Padding(
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 16,
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Tambah Kontak Person',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.darkRed,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                /// Nama
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nama',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Nama wajib diisi' : null,
+                ),
+                const SizedBox(height: 12),
+
+                /// Jabatan
+                TextFormField(
+                  controller: _roleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Jabatan',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Jabatan wajib diisi' : null,
+                ),
+                const SizedBox(height: 12),
+
+                /// Jam Operasional
+                TextFormField(
+                  controller: _timeController,
+                  decoration: const InputDecoration(
+                    labelText: 'Jam Operasional',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) => v == null || v.isEmpty
+                      ? 'Jam operasional wajib diisi'
+                      : null,
+                ),
+                const SizedBox(height: 12),
+
+                /// Info
+                TextFormField(
+                  controller: _infoController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: 'Keterangan',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Keterangan wajib diisi' : null,
+                ),
+                const SizedBox(height: 20),
+
+                /// Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Batal'),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Card(
-                      child: ListTile(
-                        tileColor: AppColors.white,
-                        leading: const Icon(
-                          Icons.phone,
-                          color: AppColors.primary,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.shade700,
                         ),
-                        title: const Text("Telepon"),
-                        subtitle: const Text("+62 812 3456 7890"),
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        tileColor: AppColors.white,
-                        leading: const Icon(
-                          Icons.email,
-                          color: AppColors.primary,
+                        child: const Text(
+                          'Tambah',
+                          style: TextStyle(color: Colors.white),
                         ),
-                        title: const Text("Email"),
-                        subtitle: const Text("info@rasadharma.org"),
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        tileColor: AppColors.white,
-                        leading: const Icon(
-                          Icons.location_on,
-                          color: AppColors.primary,
-                        ),
-                        title: const Text("Alamat"),
-                        subtitle: const Text(
-                          "Jl. Boen Hian Tong No. 10, Semarang",
-                        ),
-                      ),
-                    ),
+                        onPressed: () {
+                          if (!_formKey.currentState!.validate()) return;
 
-                    const SizedBox(height: 30),
+                          prov.addContact(
+                            ContactPerson(
+                              id: DateTime.now().millisecondsSinceEpoch
+                                  .toString(),
+                              name: _nameController.text.trim(),
+                              role: _roleController.text.trim(),
+                              time: _timeController.text.trim(),
+                              info: _infoController.text.trim(),
+                            ),
+                          );
 
-                    // Section: Daftar Kontak Person
-                    const Text(
-                      "Kontak Person",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.darkRed,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Column(
-                      children: _contactPersons.map((person) {
-                        return Card(
-                          color: AppColors.white,
-                          margin: const EdgeInsets.only(bottom: 12),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  person["name"]!,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.darkRed,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  person["role"]!,
-                                  style: const TextStyle(
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.access_time,
-                                      size: 16,
-                                      color: AppColors.primary,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Expanded(
-                                      child: Text(
-                                        person["time"]!,
-                                        style: const TextStyle(fontSize: 13),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  person["info"]!,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    height: 1.3,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-
-                    const SizedBox(height: 30),
-
-                    // Section: Form Pesan
-                    const Text(
-                      "Kirim Pesan",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.darkRed,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            child: TextFormField(
-                              decoration: InputDecoration(
-                                labelText: "Nama *",
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              validator: (v) =>
-                                  v == null || v.isEmpty ? "Harus diisi" : null,
-                              onSaved: (v) => _name = v ?? "",
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            child: TextFormField(
-                              decoration: InputDecoration(
-                                labelText: "Email *",
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              validator: (v) => v == null || !v.contains("@")
-                                  ? "Email tidak valid"
-                                  : null,
-                              onSaved: (v) => _email = v ?? "",
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            child: TextFormField(
-                              decoration: InputDecoration(
-                                labelText: "Pesan *",
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              maxLines: 4,
-                              validator: (v) =>
-                                  v == null || v.isEmpty ? "Harus diisi" : null,
-                              onSaved: (v) => _message = v ?? "",
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: _isSending ? null : _submit,
-                              icon: const Icon(Icons.send),
-                              label: Text(_isSending ? "Mengirim..." : "Kirim"),
-                            ),
-                          ),
-                        ],
+                          Navigator.pop(context);
+                        },
                       ),
                     ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 16),
+              ],
             ),
-          ],
+          ),
         ),
+      );
+    },
+  );
+}
+
+class _InfoTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  const _InfoTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: AppColors.white,
+      child: ListTile(
+        leading: Icon(icon, color: AppColors.primary),
+        title: Text(title),
+        subtitle: Text(subtitle),
       ),
     );
   }
