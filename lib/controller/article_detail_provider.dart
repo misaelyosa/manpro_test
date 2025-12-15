@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:rasadharma_app/data/classes/article.dart';
 import 'package:rasadharma_app/data/repository/article_repo.dart';
+import 'package:rasadharma_app/data/repository/auth_service.dart';
 
 class ArticleDetailProvider extends ChangeNotifier {
   final ArticleRepository _repository = ArticleRepository();
   final Article article;
-  final bool isAdmin;
+  bool isAdmin = false;
+  final AuthService _auth = AuthService();
 
   bool isEditMode = false;
   bool isLoading = false;
@@ -15,13 +17,12 @@ class ArticleDetailProvider extends ChangeNotifier {
   late TextEditingController readTimeController;
   bool isFeatured;
 
-  ArticleDetailProvider({
-    required this.article,
-    required this.isAdmin,
-  }) : isFeatured = article.isFeatured {
+  ArticleDetailProvider({required this.article})
+    : isFeatured = article.isFeatured {
     titleController = TextEditingController(text: article.title);
     contentController = TextEditingController(text: article.content);
     readTimeController = TextEditingController(text: article.readTime);
+    checkAdmin();
   }
 
   void toggleEditMode() {
@@ -38,15 +39,12 @@ class ArticleDetailProvider extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    await _repository.updateArticle(
-      article.id,
-      {
-        'title': titleController.text.trim(),
-        'content': contentController.text.trim(),
-        'read_time': readTimeController.text.trim(),
-        'is_featured': isFeatured,
-      },
-    );
+    await _repository.updateArticle(article.id, {
+      'title': titleController.text.trim(),
+      'content': contentController.text.trim(),
+      'read_time': readTimeController.text.trim(),
+      'is_featured': isFeatured,
+    });
 
     isEditMode = false;
     isLoading = false;
@@ -59,6 +57,14 @@ class ArticleDetailProvider extends ChangeNotifier {
 
   void toggleFeatured(bool value) {
     isFeatured = value;
+    notifyListeners();
+  }
+
+  Future<void> checkAdmin() async {
+    final user = await _auth.getLoggedUser();
+    if (user == null) return;
+
+    isAdmin = user.role == 'admin';
     notifyListeners();
   }
 

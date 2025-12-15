@@ -53,10 +53,6 @@ class _HomePageState extends State<HomePage> {
         centerTitle: false,
         backgroundColor: Colors.white,
         foregroundColor: AppColors.darkRed,
-        leading: const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: CircleAvatar(backgroundColor: Colors.green),
-        ),
         title: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Column(
@@ -241,130 +237,7 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                   ],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Text(
-                      "Kegiatan Terbaru",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.darkRed,
-                      ),
-                      softWrap: true,
-                      textAlign: TextAlign.start,
-                    ),
-                    const Spacer(),
-                    InkWell(
-                      onTap: () {
-                        // lihat semua
-                      },
-                      child: Text(
-                        "Lihat Semua",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.darkRed,
-                        ),
-                        softWrap: true,
-                        textAlign: TextAlign.end,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-
-                // Carousel / PageView
-                SizedBox(
-                  height: 180,
-                  child: PageView.builder(
-                    controller: _pageController,
-                    onPageChanged: (index) {
-                      setState(() => _currentPage = index);
-                    },
-                    itemCount: recentActivities.length,
-                    itemBuilder: (context, index) {
-                      final Map<String, String> a = recentActivities[index];
-                      return AnimatedBuilder(
-                        animation: _pageController,
-                        builder: (context, child) {
-                          // aman akses page: kalau belum ready, gunakan currentPage sebagai fallback
-                          double pageValue;
-                          if (_pageController.hasClients &&
-                              _pageController.page != null) {
-                            pageValue = _pageController.page!;
-                          } else {
-                            pageValue = _currentPage.toDouble();
-                          }
-
-                          double diff = (pageValue - index).abs();
-                          double scale = (1 - (diff * 0.2)).clamp(0.8, 1.0);
-
-                          return Transform.scale(
-                            scale: scale,
-                            child: Card(
-                              color: AppColors.white,
-                              margin: const EdgeInsets.symmetric(horizontal: 8),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      a['title'] ?? '',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      a['desc'] ?? '',
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(fontSize: 14),
-                                    ),
-                                    const Spacer(),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Text(
-                                        a['date'] ?? '',
-                                        style: const TextStyle(
-                                          color: AppColors.gray,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-                // Carousel Indicators
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(recentActivities.length, (index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: _currentPage == index ? 12 : 8,
-                      height: _currentPage == index ? 12 : 8,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _currentPage == index
-                            ? AppColors.primary
-                            : AppColors.gray.withOpacity(0.4),
-                      ),
-                    );
-                  }),
-                ),
+                ),            
               ],
             ),
           ),

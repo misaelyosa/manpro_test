@@ -20,7 +20,10 @@ class ArticlePage extends StatelessWidget {
       child: Builder(
         builder: (context) {
           // Get a non-listening reference to the provider once here.
-          final articleProvider = Provider.of<ArticlePageProvider>(context, listen: false);
+          final articleProvider = Provider.of<ArticlePageProvider>(
+            context,
+            listen: false,
+          );
 
           return Scaffold(
             backgroundColor: AppColors.background,
@@ -38,21 +41,25 @@ class ArticlePage extends StatelessWidget {
               foregroundColor: AppColors.darkRed,
               elevation: 0.5,
               actions: [
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {
-                    // Refresh the list after adding an article too
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const AddArticlePage(),
-                      ),
-                    ).then((value) {
-                      // Check if a value was returned (e.g., indicating success)
-                      if (value == true) {
-                         articleProvider.fetchArticles();
-                      }
-                    });
+                Consumer<ArticlePageProvider>(
+                  builder: (context, prov, _) {
+                    if (!prov.isAdmin) return const SizedBox.shrink();
+
+                    return IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AddArticlePage(),
+                          ),
+                        ).then((value) {
+                          if (value == true) {
+                            articleProvider.fetchArticles();
+                          }
+                        });
+                      },
+                    );
                   },
                 ),
               ],
@@ -70,18 +77,24 @@ class ArticlePage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (prov.featuredArticle != null)
-                        _FeaturedArticle(article: prov.featuredArticle!, provider: articleProvider),
+                        _FeaturedArticle(
+                          article: prov.featuredArticle!,
+                          provider: articleProvider,
+                        ),
                       const SizedBox(height: 24),
                       _buildSectionTitle("Latest Articles"),
                       const SizedBox(height: 16),
-                      _ArticleGrid(articles: prov.articles, provider: articleProvider),
+                      _ArticleGrid(
+                        articles: prov.articles,
+                        provider: articleProvider,
+                      ),
                     ],
                   ),
                 );
               },
             ),
           );
-        }
+        },
       ),
     );
   }
@@ -102,10 +115,10 @@ class ArticlePage extends StatelessWidget {
 class _FeaturedArticle extends StatelessWidget {
   final Article article;
   // Pass the provider reference for refreshing the list
-  final ArticlePageProvider provider; 
+  final ArticlePageProvider provider;
 
   const _FeaturedArticle({required this.article, required this.provider});
-  
+
   // Helper method to format the date without external libraries
   String _formatDateWithoutTime(dynamic date) {
     if (date == null) return "N/A";
@@ -132,15 +145,12 @@ class _FeaturedArticle extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ArticleDetailPage(
-              article: article,
-              isAdmin: true, 
-            ),
+            builder: (_) => ArticleDetailPage(article: article),
           ),
         ).then((wasModified) {
           // The ArticleDetailPage returns 'true' on successful edit or delete.
           if (wasModified == true) {
-            provider.fetchArticles(); 
+            provider.fetchArticles();
           }
         });
         // ---------------------------------------------------------------------
@@ -220,7 +230,7 @@ class _FeaturedArticle extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    formattedDate, 
+                    formattedDate,
                     style: const TextStyle(fontSize: 12, color: AppColors.gray),
                   ),
                 ],
@@ -262,15 +272,13 @@ class _ArticleGrid extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ArticleDetailPage(
-                        article: article,
-                        isAdmin: true,
-                      ),
+                      builder: (_) =>
+                          ArticleDetailPage(article: article),
                     ),
                   ).then((wasModified) {
                     // The ArticleDetailPage returns 'true' on successful edit or delete.
                     if (wasModified == true) {
-                      provider.fetchArticles(); 
+                      provider.fetchArticles();
                     }
                   });
                   // ---------------------------------------------------------------------
@@ -287,7 +295,7 @@ class _ArticleGrid extends StatelessWidget {
 
 // MODIFIED _ArticleCard (No logic change needed here, just data presentation)
 class _ArticleCard extends StatelessWidget {
-// ... (rest of _ArticleCard remains unchanged)
+  // ... (rest of _ArticleCard remains unchanged)
   final Article article;
 
   const _ArticleCard({required this.article});
@@ -336,7 +344,8 @@ class _ArticleCard extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                fontSize: 18, // Slightly smaller than featured (20) but larger than original (16)
+                fontSize:
+                    18, // Slightly smaller than featured (20) but larger than original (16)
                 fontWeight: FontWeight.bold,
                 color: AppColors.darkRed,
               ),
@@ -353,16 +362,15 @@ class _ArticleCard extends StatelessWidget {
                 height: 1.3,
               ),
             ),
-            const SizedBox(height: 12), // Increased spacing before the footer row
+            const SizedBox(
+              height: 12,
+            ), // Increased spacing before the footer row
             // Footer row updated to match featured article icons and layout
             Row(
-              mainAxisAlignment: MainAxisAlignment.start, // Align to start for better grouping
+              mainAxisAlignment:
+                  MainAxisAlignment.start, // Align to start for better grouping
               children: [
-                const Icon(
-                  Icons.access_time,
-                  size: 16,
-                  color: AppColors.gray,
-                ),
+                const Icon(Icons.access_time, size: 16, color: AppColors.gray),
                 const SizedBox(width: 4),
                 Text(
                   article.readTime,

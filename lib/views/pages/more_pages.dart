@@ -175,28 +175,28 @@ class _MorePagesState extends State<MorePages> {
                     ),
 
                   const Divider(),
-                  const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text(
-                      "Pengaturan",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.darkRed,
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.settings,
-                      color: AppColors.primary,
-                    ),
-                    title: const Text("Pengaturan Aplikasi"),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      // TODO: navigasi ke halaman pengaturan jika ada
-                    },
-                  ),
+                  // const Padding(
+                  //   padding: EdgeInsets.all(16),
+                  //   child: Text(
+                  //     "Pengaturan",
+                  //     style: TextStyle(
+                  //       fontSize: 16,
+                  //       fontWeight: FontWeight.bold,
+                  //       color: AppColors.darkRed,
+                  //     ),
+                  //   ),
+                  // ),
+                  // ListTile(
+                  //   leading: const Icon(
+                  //     Icons.settings,
+                  //     color: AppColors.primary,
+                  //   ),
+                  //   title: const Text("Pengaturan Aplikasi"),
+                  //   trailing: const Icon(Icons.chevron_right),
+                  //   onTap: () {
+                  //     // TODO: navigasi ke halaman pengaturan jika ada
+                  //   },
+                  // ),
 
                   const SizedBox(height: 24),
 
@@ -230,15 +230,15 @@ class _MorePagesState extends State<MorePages> {
                       ),
                     ),
                   ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.download,
-                      color: AppColors.primary,
-                    ),
-                    title: const Text("Export Data (CSV)"),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: exportToCSVDownload,
-                  ),
+                  // ListTile(
+                  //   leading: const Icon(
+                  //     Icons.download,
+                  //     color: AppColors.primary,
+                  //   ),
+                  //   title: const Text("Export Data (CSV)"),
+                  //   trailing: const Icon(Icons.chevron_right),
+                  //   onTap: exportToCSVDownload,
+                  // ),
                 ],
               ),
             ),

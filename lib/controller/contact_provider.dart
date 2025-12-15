@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rasadharma_app/data/classes/contact_person.dart';
+import 'package:rasadharma_app/data/repository/auth_service.dart';
 import 'package:rasadharma_app/data/repository/contact_repo.dart';
 
 class ContactProvider extends ChangeNotifier {
@@ -8,6 +9,7 @@ class ContactProvider extends ChangeNotifier {
 
   final List<ContactPerson> _contacts = [];
   List<ContactPerson> get contacts => List.unmodifiable(_contacts);
+  final AuthService _auth = AuthService();
 
   bool isAdmin = false;
   bool fetchingContacts = false;
@@ -18,8 +20,11 @@ class ContactProvider extends ChangeNotifier {
   }
 
   Future<void> checkAdmin() async {
-    // TODO: replace with AuthService
-    isAdmin = true;
+    final user = await _auth.getLoggedUser();
+    if (user == null) return;
+
+    // adjust according to your user model
+    isAdmin = user.role == 'admin';
     notifyListeners();
   }
 

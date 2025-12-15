@@ -6,12 +6,10 @@ import 'package:rasadharma_app/theme/colors.dart';
 
 class ArticleDetailPage extends StatelessWidget {
   final Article article;
-  final bool isAdmin;
 
   const ArticleDetailPage({
     super.key,
     required this.article,
-    required this.isAdmin,
   });
 
   @override
@@ -19,7 +17,6 @@ class ArticleDetailPage extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ArticleDetailProvider(
         article: article,
-        isAdmin: isAdmin,
       ),
       child: const _ArticleDetailView(),
     );

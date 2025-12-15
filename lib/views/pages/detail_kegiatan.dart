@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:media_store_plus/media_store_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:rasadharma_app/controller/kegiatan_provider.dart';
 import 'package:rasadharma_app/data/classes/Events.dart';
@@ -8,6 +9,7 @@ import 'package:rasadharma_app/views/pages/kegiatan_pages.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 
 class DetailKegiatan extends StatefulWidget {
   final Kegiatan kegiatan;
@@ -31,7 +33,17 @@ class _DetailKegiatanState extends State<DetailKegiatan> {
   void initState() {
     super.initState();
     registeredUsers = [];
+    _initMediaStore();
     _fetchRegisteredUsers();
+  }
+
+  Future<void> _initMediaStore() async {
+    if (kIsWeb) {
+      return; // web tidak support MediaStore
+    } else if (Platform.isAndroid) {
+      await MediaStore.ensureInitialized();
+      MediaStore.appFolder = "Rasadharma";
+    }
   }
 
   Future<void> _fetchRegisteredUsers() async {
@@ -583,17 +595,48 @@ class _DetailKegiatanState extends State<DetailKegiatan> {
     );
   }
 
+  // Inside _DetailKegiatanState class
+
   Future<void> _exportToCsv() async {
     try {
-      // Prepare CSV data
-      List<List<String>> csvData = [
-        ['Nama', 'Email', 'No. Telepon', 'Tanggal Pendaftaran'], // Headers
-      ];
+      // 1. Prepare CSV data
+      List<List<dynamic>> csvData = [];
+
+      // --- A. Event Details (Header/Metadata) ---
+      csvData.add(['Detail Kegiatan']);
+      csvData.add([]); // Blank line
+      csvData.add(['Nama Kegiatan', widget.kegiatan.namaKegiatan]);
+      csvData.add(['Kategori', widget.kegiatan.kategori]);
+      csvData.add(['Tanggal', _formatDate(widget.kegiatan.tanggalKegiatan)]);
+      csvData.add([
+        'Waktu',
+        '${widget.kegiatan.waktuMulai} - ${widget.kegiatan.waktuSelesai}',
+      ]);
+      csvData.add(['Lokasi', widget.kegiatan.lokasi]);
+      csvData.add(['Kapasitas', widget.kegiatan.capacity.toString()]);
+      csvData.add([
+        'Peserta Terdaftar',
+        widget.kegiatan.registeredAmount.toString(),
+      ]);
+      csvData.add([]); // Blank line
+      csvData.add([]); // Blank line
+
+      // --- B. Registered Users (List) ---
+      csvData.add(['Daftar Peserta']);
+      csvData.add([
+        'No',
+        'Nama',
+        'Email',
+        'No. Telepon',
+        'Tanggal Pendaftaran',
+      ]); // Users Headers
 
       // Add user data
       if (registeredUsers != null) {
-        for (var user in registeredUsers!) {
+        for (var i = 0; i < registeredUsers!.length; i++) {
+          final user = registeredUsers![i];
           csvData.add([
+            (i + 1).toString(), // No.
             user.nama,
             user.email,
             user.noTelp,
@@ -602,26 +645,31 @@ class _DetailKegiatanState extends State<DetailKegiatan> {
         }
       }
 
-      // Convert to CSV string
+      // 2. Convert to CSV string
       String csv = const ListToCsvConverter().convert(csvData);
 
-      // Get application documents directory
-      final directory = await getApplicationDocumentsDirectory();
-      final fileName =
-          'peserta_${widget.kegiatan.namaKegiatan.replaceAll(' ', '_')}_${DateTime.now().millisecondsSinceEpoch}.csv';
-      final file = File('${directory.path}/$fileName');
+      // 3. Save to Download Directory (using assumed MediaStore utility)
+      // NOTE: You must provide the definition of MediaStore, DirType, and DirName
+      // or replace this with a package like permission_handler + path_provider for cross-platform download saving.
 
-      // Write CSV to file
-      await file.writeAsString(csv);
+      // Assuming you have the MediaStore class defined elsewhere:
+      final mediaStore =
+          MediaStore(); // Instantiate your custom MediaStore class
 
-      // Show success message with file path
+      await mediaStore.saveFile(
+        tempFilePath: await _createTempCSV(csv),
+        dirType: DirType.download,
+        dirName: DirName.download,
+      );
+
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('File CSV berhasil disimpan di: ${file.path}'),
-          duration: const Duration(seconds: 5),
+        const SnackBar(
+          content: Text("File CSV berhasil disimpan di folder Download"),
         ),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Gagal mengekspor CSV: $e')));
@@ -644,5 +692,16 @@ class _DetailKegiatanState extends State<DetailKegiatan> {
       'Desember',
     ];
     return '${dateTime.day} ${months[dateTime.month - 1]} ${dateTime.year} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
+  Future<String> _createTempCSV(String csvData) async {
+    final dir = await getTemporaryDirectory();
+    // Ensure a unique filename based on the event and time
+    final fileName =
+        'peserta_${widget.kegiatan.namaKegiatan.replaceAll(' ', '_').replaceAll(RegExp(r'[^\w]'), '')}_${DateTime.now().millisecondsSinceEpoch}.csv';
+    final path = '${dir.path}/$fileName';
+    final file = File(path);
+    await file.writeAsString(csvData);
+    return path;
   }
 }
