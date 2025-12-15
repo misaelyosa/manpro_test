@@ -1,81 +1,180 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rasadharma_app/controller/article_detail_provider.dart';
+import 'package:rasadharma_app/data/classes/article.dart';
 import 'package:rasadharma_app/theme/colors.dart';
 
-class ArticleDetailPage extends StatefulWidget {
-  const ArticleDetailPage({super.key});
+class ArticleDetailPage extends StatelessWidget {
+  final Article article;
+  final bool isAdmin;
 
-  @override
-  State<ArticleDetailPage> createState() => _ArticleDetailPageState();
-}
-
-class _ArticleDetailPageState extends State<ArticleDetailPage> {
-  // Dummy admin status and edit mode
-  final bool isAdmin = true;
-  bool isEditMode = false;
+  const ArticleDetailPage({
+    super.key,
+    required this.article,
+    required this.isAdmin,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text(
-          "Article Detail",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppColors.darkRed,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.darkRed,
-        elevation: 0.5,
-        actions: isAdmin
-            ? [
-                IconButton(
-                  icon: Icon(isEditMode ? Icons.save : Icons.edit),
-                  onPressed: () {
-                    setState(() {
-                      isEditMode = !isEditMode;
-                    });
-                  },
-                ),
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    if (value == 'delete') {
-                      // Show delete confirmation
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete, color: AppColors.primary),
-                          SizedBox(width: 8),
-                          Text('Delete Article'),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ]
-            : null,
+    return ChangeNotifierProvider(
+      create: (_) => ArticleDetailProvider(
+        article: article,
+        isAdmin: isAdmin,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: isEditMode ? _buildEditMode() : _buildReadMode(),
+      child: const _ArticleDetailView(),
+    );
+  }
+}
+
+class _ArticleDetailView extends StatelessWidget {
+  const _ArticleDetailView();
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<ArticleDetailProvider>();
+
+    return PopScope(
+      // Ensure that if the user pops while editing, it toggles read mode first
+      canPop: !provider.isAdmin || !provider.isEditMode,
+      onPopInvoked: (didPop) {
+        if (!didPop && provider.isAdmin && provider.isEditMode) {
+          provider.toggleEditMode();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          centerTitle: true,
+          title: const Text(
+            "Article Detail",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppColors.darkRed,
+            ),
+          ),
+          backgroundColor: Colors.white,
+          foregroundColor: AppColors.darkRed,
+          elevation: 0.5,
+          actions: provider.isAdmin
+              ? [
+                  IconButton(
+                    icon: Icon(
+                      provider.isEditMode ? Icons.save : Icons.edit,
+                    ),
+                    onPressed: provider.isLoading
+                        ? null
+                        : () async {
+                            if (provider.isEditMode) {
+                              try {
+                                await provider.save();
+                                
+                                if (context.mounted) {
+                                  // --- EDIT SUCCESS: SHOW SNACKBAR AND POP ---
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Article updated"),
+                                    ),
+                                  );
+                                  // POP back to the ArticlePage to refresh the list
+                                  Navigator.pop(context, true); 
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(e.toString()),
+                                    ),
+                                  );
+                                }
+                              }
+                            } else {
+                              provider.toggleEditMode();
+                            }
+                          },
+                  ),
+                  PopupMenuButton<String>(
+                    onSelected: (value) async {
+                      if (value == 'delete') {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: const Text("Delete Article"),
+                            content: const Text(
+                              "Are you sure you want to delete this article?",
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(context, false),
+                                child: const Text("Cancel"),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(context, true),
+                                child: const Text(
+                                  "Delete",
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirm == true && context.mounted) {
+                          // Note: Assuming provider.delete(context) handles the actual deletion
+                          await provider.delete(context);
+                          
+                          // --- DELETE SUCCESS: POP ---
+                          // POP back to the ArticlePage to refresh the list
+                          if (context.mounted) {
+                             Navigator.pop(context, true); 
+                          }
+                        }
+                      }
+                    },
+                    itemBuilder: (_) => const [
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete, color: Colors.red),
+                            SizedBox(width: 8),
+                            Text("Delete Article"),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ]
+              : null,
+        ),
+        body: provider.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: provider.isEditMode
+                    ? _EditMode()
+                    : _ReadMode(),
+              ),
       ),
     );
   }
+}
 
-  Widget _buildReadMode() {
+/* ---------------- READ MODE ---------------- */
+
+class _ReadMode extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<ArticleDetailProvider>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Understanding Dharma in Modern Life",
-          style: TextStyle(
+        Text(
+          provider.titleController.text,
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: AppColors.darkRed,
@@ -86,62 +185,69 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
           children: [
             const Icon(Icons.access_time, size: 16, color: AppColors.gray),
             const SizedBox(width: 4),
-            const Text(
-              "5 min read",
-              style: TextStyle(fontSize: 14, color: AppColors.gray),
+            Text(
+              provider.readTimeController.text,
+              style: const TextStyle(fontSize: 14, color: AppColors.gray),
             ),
             const SizedBox(width: 16),
             const Icon(Icons.calendar_today, size: 16, color: AppColors.gray),
             const SizedBox(width: 4),
-            const Text(
-              "December 15, 2024",
-              style: TextStyle(fontSize: 14, color: AppColors.gray),
+            Text(
+              provider.article.date.toString().split(' ').first,
+              style: const TextStyle(fontSize: 14, color: AppColors.gray),
             ),
           ],
         ),
         const SizedBox(height: 24),
-        const Text(
-          "In our fast-paced modern world, the ancient concept of dharma remains as relevant as ever. Dharma, often translated as 'righteous duty' or 'moral law,' provides a framework for living that transcends cultural and temporal boundaries.\n\nThe essence of dharma lies not in rigid rules, but in understanding our interconnectedness with all beings and acting from a place of wisdom and compassion. When we align our actions with dharmic principles, we create harmony not only within ourselves but also in our relationships and communities.\n\nOne of the key aspects of dharma is the recognition that our individual purpose is intimately connected to the greater good. This doesn't mean sacrificing our personal aspirations, but rather finding ways to pursue our goals while contributing positively to the world around us.\n\nPracticing dharma in daily life can be as simple as speaking truthfully, treating others with kindness, and making decisions that consider their impact on future generations. It's about cultivating awareness of our thoughts, words, and actions, and choosing those that promote peace, justice, and well-being.\n\nAs we navigate the complexities of modern existence, dharma serves as a compass, guiding us toward choices that honor both our individual growth and our collective responsibility. By embracing these timeless principles, we can find meaning and purpose in our contemporary lives while contributing to a more harmonious world.",
-          style: TextStyle(fontSize: 16, color: AppColors.gray, height: 1.6),
+        Text(
+          provider.contentController.text,
+          style: const TextStyle(
+            fontSize: 16,
+            height: 1.6,
+            color: AppColors.gray,
+          ),
         ),
       ],
     );
   }
+}
 
-  Widget _buildEditMode() {
+/* ---------------- EDIT MODE ---------------- */
+
+class _EditMode extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<ArticleDetailProvider>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildEditField(
-          "Title",
-          "Understanding Dharma in Modern Life",
+        _EditField(
+          label: "Title",
+          controller: provider.titleController,
           maxLines: 2,
         ),
         const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _buildEditField("Read Time", "5 min read", maxLines: 1),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildEditField("Date", "December 15, 2024", maxLines: 1),
-            ),
-          ],
+        _EditField(
+          label: "Read Time",
+          controller: provider.readTimeController,
+          maxLines: 1,
         ),
         const SizedBox(height: 16),
-        _buildEditField(
-          "Content",
-          "In our fast-paced modern world, the ancient concept of dharma remains as relevant as ever. Dharma, often translated as 'righteous duty' or 'moral law,' provides a framework for living that transcends cultural and temporal boundaries.\n\nThe essence of dharma lies not in rigid rules, but in understanding our interconnectedness with all beings and acting from a place of wisdom and compassion.",
+        _EditField(
+          label: "Content",
+          controller: provider.contentController,
           maxLines: 15,
         ),
         const SizedBox(height: 24),
         Row(
           children: [
             Checkbox(
-              value: true,
+              value: provider.isFeatured,
               onChanged: (value) {
-                // Handle featured toggle
+                if (value != null) {
+                  provider.toggleFeatured(value);
+                }
               },
               activeColor: AppColors.primary,
             ),
@@ -157,12 +263,23 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
       ],
     );
   }
+}
 
-  Widget _buildEditField(
-    String label,
-    String initialValue, {
-    required int maxLines,
-  }) {
+/* ---------------- SHARED FIELD ---------------- */
+
+class _EditField extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final int maxLines;
+
+  const _EditField({
+    required this.label,
+    required this.controller,
+    required this.maxLines,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -176,8 +293,8 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
         ),
         const SizedBox(height: 8),
         TextField(
+          controller: controller,
           maxLines: maxLines,
-          controller: TextEditingController(text: initialValue),
           decoration: InputDecoration(
             filled: true,
             fillColor: AppColors.white,
@@ -187,7 +304,10 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderSide: const BorderSide(
+                color: AppColors.primary,
+                width: 2,
+              ),
             ),
             contentPadding: const EdgeInsets.all(16),
           ),
