@@ -31,7 +31,7 @@ class SejarahPage extends StatelessWidget {
                 ),
               ),
             ),
-            body: _body(prov),
+            body: _body(prov, context),
           );
         },
       ),
@@ -39,7 +39,7 @@ class SejarahPage extends StatelessWidget {
   }
 }
 
-Widget _body(SejarahProvider prov) {
+Widget _body(SejarahProvider prov, BuildContext context) {
   return Column(
     children: [
       Expanded(
@@ -92,6 +92,38 @@ Widget _body(SejarahProvider prov) {
                   ),
                   const SizedBox(height: 20),
 
+                  if (prov.isAdmin) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => _showAddSejarahModal(context, prov),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.shade700,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Text(
+                              'Tambah Sejarah',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Icon(Icons.add, color: Colors.white, size: 18),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+
+                  SizedBox(height: 20),
                   Column(
                     children: List.generate(prov.sejarahData.length, (i) {
                       final item = prov.sejarahData[i];
@@ -114,5 +146,149 @@ Widget _body(SejarahProvider prov) {
         ),
       ),
     ],
+  );
+}
+
+void _showAddSejarahModal(BuildContext context, SejarahProvider prov) {
+  final _formKey = GlobalKey<FormState>();
+
+  final _judulController = TextEditingController();
+  final _tahunController = TextEditingController();
+  final _deskripsiController = TextEditingController();
+
+  DateTime? _selectedYear;
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) => Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        left: 16,
+        right: 16,
+        top: 16,
+      ),
+      child: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Tambah Sejarah',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              /// Judul
+              TextFormField(
+                controller: _judulController,
+                decoration: const InputDecoration(
+                  labelText: 'Judul',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Judul wajib diisi' : null,
+              ),
+              const SizedBox(height: 12),
+
+              /// Tahun (Year picker)
+              TextFormField(
+                controller: _tahunController,
+                readOnly: true,
+                decoration: const InputDecoration(
+                  labelText: 'Tahun',
+                  border: OutlineInputBorder(),
+                  suffixIcon: Icon(Icons.calendar_today),
+                ),
+                onTap: () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1800),
+                    lastDate: DateTime.now(),
+                    initialDatePickerMode: DatePickerMode.year,
+                  );
+
+                  if (pickedDate != null) {
+                    _selectedYear = pickedDate;
+                    _tahunController.text = pickedDate.year.toString();
+                  }
+                },
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Tahun wajib dipilih'
+                    : null,
+              ),
+              const SizedBox(height: 12),
+
+              /// Deskripsi
+              TextFormField(
+                controller: _deskripsiController,
+                maxLines: 4,
+                decoration: const InputDecoration(
+                  labelText: 'Deskripsi',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Deskripsi wajib diisi'
+                    : null,
+              ),
+              const SizedBox(height: 20),
+
+              /// Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.red),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text(
+                        'Batal',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState?.validate() ?? false) {
+                          await prov.createSejarah(
+                            judul: _judulController.text.trim(),
+                            tahun: _selectedYear!,
+                            deskripsi: _deskripsiController.text.trim(),
+                          );
+                          Navigator.pop(context);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red.shade700,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text(
+                        'Tambah',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+    ),
   );
 }

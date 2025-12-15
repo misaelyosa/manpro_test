@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rasadharma_app/data/classes/history.dart';
 import 'package:rasadharma_app/data/enums/collection_enums.dart';
 
 class SejarahRepo {
