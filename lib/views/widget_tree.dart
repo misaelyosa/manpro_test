@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rasadharma_app/controller/kegiatan_provider.dart';
 import 'package:rasadharma_app/data/notifiers.dart';
+import 'package:rasadharma_app/views/pages/article_page.dart';
 import 'package:rasadharma_app/views/pages/donasi_page.dart';
 import 'package:rasadharma_app/views/pages/home_page.dart';
 import 'package:rasadharma_app/views/pages/kegiatan_pages.dart';
@@ -12,6 +13,7 @@ import 'package:rasadharma_app/views/widgets/navbar_widget.dart';
 List<Widget> pages = [
   HomePage(),
   KegiatanPages(),
+  ArticlePage(),
   DonasiPage(),
   KontakPage(),
   MorePages(),
