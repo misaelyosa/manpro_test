@@ -127,14 +127,38 @@ Widget _body(SejarahProvider prov, BuildContext context) {
                   Column(
                     children: List.generate(prov.sejarahData.length, (i) {
                       final item = prov.sejarahData[i];
+
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 30),
-                        child: TimelineItem(
-                          year: item.tahun.year.toString(),
-                          title: item.judul,
-                          description: item.deskripsi,
-                          color: AppColors.darkRed,
-                          isLast: i == prov.sejarahData.length - 1,
+                        child: Stack(
+                          children: [
+                            TimelineItem(
+                              year: item.tahun.year.toString(),
+                              title: item.judul,
+                              description: item.deskripsi,
+                              color: AppColors.darkRed,
+                              isLast: i == prov.sejarahData.length - 1,
+                            ),
+
+                            if (prov.isAdmin)
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () {
+                                    _confirmDeleteSejarah(
+                                      context,
+                                      prov,
+                                      item.id,
+                                    );
+                                  },
+                                ),
+                              ),
+                          ],
                         ),
                       );
                     }),
@@ -146,6 +170,34 @@ Widget _body(SejarahProvider prov, BuildContext context) {
         ),
       ),
     ],
+  );
+}
+
+void _confirmDeleteSejarah(
+  BuildContext context,
+  SejarahProvider prov,
+  String sejarahId,
+) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Hapus Sejarah'),
+      content: const Text('Apakah kamu yakin ingin menghapus sejarah ini?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          onPressed: () async {
+            Navigator.pop(context);
+            await prov.deleteSejarah(sejarahId);
+          },
+          child: const Text('Hapus', style: TextStyle(color: Colors.white)),
+        ),
+      ],
+    ),
   );
 }
 

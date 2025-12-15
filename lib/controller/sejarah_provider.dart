@@ -36,6 +36,26 @@ class SejarahProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteSejarah(String sejarahId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection(CollectionEnums.sejarah)
+          .doc(sejarahId)
+          .delete();
+
+      sejarahData.removeWhere((item) => item.id == sejarahId);
+      notifyListeners();
+
+      ScaffoldMessenger.of(
+        _context!,
+      ).showSnackBar(const SnackBar(content: Text('Sejarah berhasil dihapus')));
+    } catch (e) {
+      ScaffoldMessenger.of(
+        _context!,
+      ).showSnackBar(SnackBar(content: Text('Gagal menghapus sejarah: $e')));
+    }
+  }
+
   Future<void> checkAdmin() async {
     final user = await _auth.getLoggedUser();
     if (user == null) return;
