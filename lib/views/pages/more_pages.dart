@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:csv/csv.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:media_store_plus/media_store_plus.dart';
@@ -35,7 +36,9 @@ class _MorePagesState extends State<MorePages> {
   }
 
   Future<void> _initMediaStore() async {
-    if (Platform.isAndroid) {
+    if (kIsWeb) {
+      return; // web tidak support MediaStore
+    } else if (Platform.isAndroid) {
       await MediaStore.ensureInitialized();
       MediaStore.appFolder = "Rasadharma";
     }

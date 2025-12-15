@@ -52,8 +52,8 @@ class _NavbarWidgetState extends State<NavbarWidget> {
                 ),
                 NavItems(
                   index: 2,
-                  icon: Icons.favorite_border,
-                  label: "Donasi",
+                  icon: Icons.article,
+                  label: "Artikel",
                   isSelected: value == 2,
                   onTap: (i) {
                     selectedPage.value = 2;
@@ -61,8 +61,8 @@ class _NavbarWidgetState extends State<NavbarWidget> {
                 ),
                 NavItems(
                   index: 3,
-                  icon: Icons.people,
-                  label: "Kontak",
+                  icon: Icons.favorite_border,
+                  label: "Donasi",
                   isSelected: value == 3,
                   onTap: (i) {
                     selectedPage.value = 3;
@@ -70,11 +70,20 @@ class _NavbarWidgetState extends State<NavbarWidget> {
                 ),
                 NavItems(
                   index: 4,
-                  icon: Icons.more_horiz,
-                  label: "More",
+                  icon: Icons.people,
+                  label: "Kontak",
                   isSelected: value == 4,
                   onTap: (i) {
                     selectedPage.value = 4;
+                  },
+                ),
+                NavItems(
+                  index: 5,
+                  icon: Icons.more_horiz,
+                  label: "More",
+                  isSelected: value == 5,
+                  onTap: (i) {
+                    selectedPage.value = 5;
                   },
                 ),
               ],
