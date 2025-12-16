@@ -73,41 +73,41 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        actions: [
-          Builder(
-            builder: (context) {
-              return IconButton(
-                icon: const Icon(Icons.menu, color: AppColors.darkRed),
-                onPressed: () {
-                  Scaffold.of(context).openEndDrawer();
-                },
-              );
-            },
-          ),
-        ],
+        // actions: [
+        //   Builder(
+        //     builder: (context) {
+        //       return IconButton(
+        //         icon: const Icon(Icons.menu, color: AppColors.darkRed),
+        //         onPressed: () {
+        //           Scaffold.of(context).openEndDrawer();
+        //         },
+        //       );
+        //     },
+        //   ),
+        // ],
       ),
-      endDrawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: AppColors.darkRed),
-              child: Text(
-                'Drawer Header',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            ListTile(title: const Text('Item 1'), onTap: () {}),
-            ListTile(title: const Text('Item 2'), onTap: () {}),
-            ListTile(
-              title: const Text('Exit'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
+      // endDrawer: Drawer(
+      //   child: ListView(
+      //     padding: EdgeInsets.zero,
+      //     children: [
+      //       const DrawerHeader(
+      //         decoration: BoxDecoration(color: AppColors.darkRed),
+      //         child: Text(
+      //           'Drawer Header',
+      //           style: TextStyle(color: Colors.white),
+      //         ),
+      //       ),
+      //       ListTile(title: const Text('Item 1'), onTap: () {}),
+      //       ListTile(title: const Text('Item 2'), onTap: () {}),
+      //       ListTile(
+      //         title: const Text('Exit'),
+      //         onTap: () {
+      //           Navigator.pop(context);
+      //         },
+      //       ),
+      //     ],
+      //   ),
+      // ),
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -237,7 +237,7 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                   ],
-                ),            
+                ),
               ],
             ),
           ),
