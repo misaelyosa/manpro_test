@@ -8,12 +8,14 @@ class EventsCard extends StatefulWidget {
     required this.event,
     required this.isRegistered,
     this.onRegister,
+    this.onCancel,
     this.isadmin,
   });
 
   final Kegiatan event;
   final bool isRegistered;
   final VoidCallback? onRegister;
+  final VoidCallback? onCancel;
   final bool? isadmin;
 
   @override
@@ -37,7 +39,7 @@ class _EventsCardState extends State<EventsCard> {
 
     final bool isPastEvent = eventDate.isBefore(today);
 
-    final bool isDisabled = isFull || widget.isRegistered || isPastEvent;
+    final bool isDisabled = isFull || isPastEvent;
 
     return Container(
       decoration: BoxDecoration(
@@ -144,7 +146,7 @@ class _EventsCardState extends State<EventsCard> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: isDisabled ? null : widget.onRegister,
+              onPressed: isDisabled ? null : widget.isRegistered ? widget.onCancel : widget.onRegister,
               style: ElevatedButton.styleFrom(
                 backgroundColor: isDisabled ? Colors.grey : Colors.red.shade700,
                 shape: RoundedRectangleBorder(
@@ -161,7 +163,7 @@ class _EventsCardState extends State<EventsCard> {
                         : isFull
                         ? 'Penuh'
                         : widget.isRegistered
-                        ? 'Sudah Terdaftar'
+                        ? 'Cancel Pendaftaran'
                         : 'Daftar Sekarang',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,

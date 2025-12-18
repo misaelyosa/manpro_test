@@ -110,6 +110,9 @@ Widget _body(BuildContext context, KegiatanProvider prov) {
                               isadmin: prov.isAdmin,
                               event: event,
                               isRegistered: prov.isRegistered(event.id),
+                              onCancel: prov.isRegistered(event.id)
+                                  ? () => prov.onCancel(event)
+                                  : null,
                               onRegister: prov.isRegistered(event.id)
                                   ? null
                                   : () => prov.onRegister(event),

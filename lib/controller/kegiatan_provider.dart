@@ -121,7 +121,7 @@ class KegiatanProvider extends ChangeNotifier {
       deskripsi: deskripsi,
       capacity: capacity,
     );
-    
+
     // update local cache
     final index = events.indexWhere((e) => e.id == eventId);
     if (index != -1) {
@@ -243,6 +243,66 @@ class KegiatanProvider extends ChangeNotifier {
       ScaffoldMessenger.of(
         _context!,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  Future<void> onCancel(Kegiatan e) async {
+    final UserBHT? user = await _auth.getLoggedUser();
+    if (user == null) {
+      ScaffoldMessenger.of(_context!).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Silahkan login terlebih dahulu untuk membatalkan pendaftaran kegiatan",
+          ),
+        ),
+      );
+      return;
+    }
+
+    final firestore = FirebaseFirestore.instance;
+    final kegiatanRef = firestore.collection('kegiatan').doc(e.id);
+    final registrationRef = kegiatanRef
+        .collection('registrations')
+        .doc(user.id);
+
+    try {
+      await firestore.runTransaction((transaction) async {
+        final kegiatanSnap = await transaction.get(kegiatanRef);
+        if (!kegiatanSnap.exists) {
+          throw Exception("Kegiatan tidak ditemukan");
+        }
+
+        final registrationSnap = await transaction.get(registrationRef);
+        if (!registrationSnap.exists) {
+          throw Exception("Anda belum terdaftar di kegiatan ini");
+        }
+
+        final int currentCount = kegiatanSnap['registered_amount'] ?? 0;
+
+        // Hapus pendaftaran
+        transaction.delete(registrationRef);
+
+        // Update counter (jaga agar tidak minus)
+        transaction.update(kegiatanRef, {
+          'registered_amount': currentCount > 0 ? currentCount - 1 : 0,
+        });
+      });
+
+      final message = '''${user.nama} Membatalkan Pendaftaran ${e.namaKegiatan} 📢''';
+
+      await sendWaFonnte(adminPhone: '6287855570801', message: message);
+
+      ScaffoldMessenger.of(_context!).showSnackBar(
+        SnackBar(content: Text("Pendaftaran ${e.namaKegiatan} dibatalkan")),
+      );
+
+      await getKegiatan();
+      _registrationStatus[e.id] = false;
+      notifyListeners();
+    } catch (err) {
+      ScaffoldMessenger.of(
+        _context!,
+      ).showSnackBar(SnackBar(content: Text(err.toString())));
     }
   }
 
