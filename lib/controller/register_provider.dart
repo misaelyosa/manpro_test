@@ -94,7 +94,11 @@ class RegisterProvider extends ChangeNotifier {
       // 2. Save profile data to Firestore
       _auth.addUserToCollection(uid!, email, nama, noTelp, "user");
 
-      // 3. Navigate to Welcome Page
+      // 3. Inform user to verify email and go back to welcome/login
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Verification email sent. Please check your inbox.')),
+      );
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => WellcomePage()),

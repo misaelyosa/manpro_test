@@ -20,6 +20,15 @@ class AuthService {
         email: email,
         password: password,
       );
+      
+      try {
+        await result.user?.sendEmailVerification();
+      } catch (e) {
+        log('Failed to send verification email: $e');
+      }
+      
+      await _auth.signOut();
+
       return result.user;
     } on FirebaseAuthException catch (e) {
       throw e.message ?? "Registration failed";
@@ -78,9 +87,44 @@ class AuthService {
         email: email,
         password: password,
       );
-      return result.user;
+      final user = result.user;
+
+      // If email not verified, send verification and prevent access
+      if (user != null && !user.emailVerified) {
+        try {
+          await user.sendEmailVerification();
+        } catch (e) {
+          log('Failed to resend verification email: $e');
+        }
+
+        await _auth.signOut();
+        throw 'Email not verified. A verification email has been sent. Please verify before logging in.';
+      }
+
+      return user;
     } on FirebaseAuthException catch (e) {
       throw e.message ?? "Login failed";
+    }
+  }
+
+  /// Send password reset email
+  Future<void> sendPasswordReset(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      throw e.message ?? 'Failed to send password reset email';
+    }
+  }
+
+  /// Resend verification email for currently signed-in user
+  Future<void> resendVerificationForCurrentUser() async {
+    final user = _auth.currentUser;
+    if (user == null) throw 'No signed-in user to send verification to.';
+
+    try {
+      await user.sendEmailVerification();
+    } on FirebaseAuthException catch (e) {
+      throw e.message ?? 'Failed to send verification email';
     }
   }
 
