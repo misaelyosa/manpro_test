@@ -70,10 +70,7 @@ class EditProfileProvider extends ChangeNotifier {
 
     try {
       // Update Firestore
-      Map<String, dynamic> updates = {
-        'nama': newNama,
-        'no_telp': newNoTelp,
-      };
+      Map<String, dynamic> updates = {'nama': newNama, 'no_telp': newNoTelp};
       await _auth.updateUserInCollection(_currentUser!.id, updates);
 
       // If email changed, update Auth and send verification
@@ -82,13 +79,19 @@ class EditProfileProvider extends ChangeNotifier {
         updates['email'] = newEmail;
 
         // Update Firestore email too
-        await _auth.updateUserInCollection(_currentUser!.id, {'email': newEmail});
+        await _auth.updateUserInCollection(_currentUser!.id, {
+          'email': newEmail,
+        });
 
         // Update SharedPref
         await _auth.logUserSharedpref(_currentUser!.id);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Profile updated. Verification email sent to new email. Please verify and login again.')),
+          SnackBar(
+            content: Text(
+              'Profile updated. Verification email sent to new email. Please verify and login again.',
+            ),
+          ),
         );
 
         // Logout and go to welcome
@@ -102,9 +105,9 @@ class EditProfileProvider extends ChangeNotifier {
         // Update SharedPref
         await _auth.logUserSharedpref(_currentUser!.id);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Profile updated successfully')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Profile updated successfully')));
 
         Navigator.pop(context);
       }
@@ -119,9 +122,13 @@ class EditProfileProvider extends ChangeNotifier {
         message = "Silakan login ulang untuk mengubah email";
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       isUpdating = false;
       notifyListeners();

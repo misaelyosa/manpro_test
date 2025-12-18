@@ -54,15 +54,28 @@ class EditProfilePage extends StatelessWidget {
                           labelText: 'Nama',
                           border: OutlineInputBorder(),
                         ),
-                        validator: (value) => provider.validateNotEmpty(value, 'Nama'),
+                        validator: (value) =>
+                            provider.validateNotEmpty(value, 'Nama'),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
+                        readOnly: true,
                         controller: provider.emailController,
-                        decoration: const InputDecoration(
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
                           labelText: 'Email',
                           border: OutlineInputBorder(),
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              verifyEmailPassDialog(
+                                context,
+                                provider.emailController.text,
+                              );
+                            },
+                            icon: Icon(Icons.edit, color: AppColors.primary),
+                          ),
                         ),
+
                         validator: provider.validateEmail,
                       ),
                       const SizedBox(height: 16),
@@ -72,13 +85,16 @@ class EditProfilePage extends StatelessWidget {
                           labelText: 'No Telepon',
                           border: OutlineInputBorder(),
                         ),
-                        validator: (value) => provider.validateNotEmpty(value, 'No Telepon'),
+                        validator: (value) =>
+                            provider.validateNotEmpty(value, 'No Telepon'),
                       ),
                       const SizedBox(height: 24),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: provider.isUpdating ? null : provider.onUpdateProfile,
+                          onPressed: provider.isUpdating
+                              ? null
+                              : provider.onUpdateProfile,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             shape: RoundedRectangleBorder(
@@ -87,7 +103,9 @@ class EditProfilePage extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                           child: provider.isUpdating
-                              ? const CircularProgressIndicator(color: Colors.white)
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
                               : const Text(
                                   'Update Profile',
                                   style: TextStyle(
@@ -107,4 +125,65 @@ class EditProfilePage extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> verifyEmailPassDialog(BuildContext context, String email) async {
+  final passController = TextEditingController();
+  // final emailController = TextEditingController();
+
+  return showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (ctx) {
+      return AlertDialog(
+        backgroundColor: Colors.white,
+        title: const Text(
+          "Konfirmasi Perubahan Email",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.primary,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              initialValue: email,
+              readOnly: true,
+              decoration: const InputDecoration(
+                labelText: "Email Saat Ini",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: passController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: "Password",
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            style: TextButton.styleFrom(),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Batal", style: TextStyle(color: AppColors.gray)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            child: const Text(
+              "Lanjutkan",
+              style: TextStyle(color: AppColors.white),
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }
