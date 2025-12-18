@@ -136,6 +136,62 @@ class WellcomePage extends StatelessWidget {
                                   ),
                                 ),
                               ),
+                              SizedBox(height: 10),
+                              TextButton(
+                                onPressed: () {
+                                  final TextEditingController _modalEmailCtl =
+                                      TextEditingController();
+
+                                  showDialog(
+                                    context: context,
+                                    builder: (ctx) {
+                                      return AlertDialog(
+                                        title: Text('Reset Password'),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              'Enter your email below to receive a password reset link.',
+                                            ),
+                                            SizedBox(height: 12),
+                                            TextField(
+                                              controller: _modalEmailCtl,
+                                              keyboardType:
+                                                  TextInputType.emailAddress,
+                                              decoration: InputDecoration(
+                                                hintText: 'email@example.com',
+                                                prefixIcon: Icon(Icons.email,
+                                                    color: AppColors.primary),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(ctx).pop();
+                                            },
+                                            child: Text('Cancel'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () async {
+                                              final email = _modalEmailCtl.text;
+                                              Navigator.of(ctx).pop();
+                                              await prov.forgotPasswordWithEmail(
+                                                  email);
+                                            },
+                                            child: Text('Send'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Text(
+                                  'Forgot Password?',
+                                  style: TextStyle(color: AppColors.primary),
+                                ),
+                              ),
                             ],
                           ),
                         ),

@@ -48,9 +48,53 @@ class LoginProvider extends ChangeNotifier {
     } catch (e) {
       log("Login failed: $e");
 
+      final message = e?.toString() ?? 'Login failed';
       ScaffoldMessenger.of(
         _context!,
-      ).showSnackBar(SnackBar(content: Text('Login failed')));
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
+  Future<void> forgotPassword() async {
+    final email = loginEmailController.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(_context!).showSnackBar(
+        SnackBar(content: Text('Please enter your email first')),
+      );
+      return;
+    }
+
+    try {
+      await _auth.sendPasswordReset(email);
+      ScaffoldMessenger.of(_context!).showSnackBar(
+        SnackBar(content: Text('Password reset email sent. Check your inbox spam folder.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(_context!).showSnackBar(
+        SnackBar(content: Text(e?.toString() ?? 'Failed to send reset email')),
+      );
+    }
+  }
+
+  /// Send password reset using provided email (used by modal)
+  Future<void> forgotPasswordWithEmail(String email) async {
+    final trimmed = email.trim();
+    if (trimmed.isEmpty) {
+      ScaffoldMessenger.of(_context!).showSnackBar(
+        SnackBar(content: Text('Please enter your email')),
+      );
+      return;
+    }
+
+    try {
+      await _auth.sendPasswordReset(trimmed);
+      ScaffoldMessenger.of(_context!).showSnackBar(
+        SnackBar(content: Text('Password reset email sent. Check your inbox spam folder.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(_context!).showSnackBar(
+        SnackBar(content: Text(e?.toString() ?? 'Failed to send reset email')),
+      );
     }
   }
 }
