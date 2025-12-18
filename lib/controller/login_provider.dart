@@ -51,7 +51,7 @@ class LoginProvider extends ChangeNotifier {
       final message = e?.toString() ?? 'Login failed';
       ScaffoldMessenger.of(
         _context!,
-      ).showSnackBar(SnackBar(content: Text(message)));
+      ).showSnackBar(SnackBar(content: Text("login gagal, email atau password salah")));
     }
   }
 

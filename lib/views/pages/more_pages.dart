@@ -13,6 +13,7 @@ import 'package:rasadharma_app/views/pages/donasi_page.dart';
 import 'package:rasadharma_app/views/pages/kegiatan_pages.dart';
 import 'package:rasadharma_app/views/pages/kontak_page.dart';
 import 'package:rasadharma_app/views/pages/sejarah_page.dart';
+import 'package:rasadharma_app/views/pages/edit_profile_page.dart';
 import 'package:rasadharma_app/views/pages/wellcome_page.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -53,6 +54,7 @@ class _MorePagesState extends State<MorePages> {
     {"icon": Icons.event, "label": "Kegiatan", "page": KegiatanPages()},
     {"icon": Icons.favorite, "label": "Donasi", "page": DonasiPage()},
     {"icon": Icons.people, "label": "Kontak", "page": KontakPage()},
+    {"icon": Icons.person, "label": "Edit Profile", "page": EditProfilePage()},
   ];
 
   final AuthService _auth = AuthService();

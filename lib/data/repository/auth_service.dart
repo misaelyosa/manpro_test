@@ -142,4 +142,46 @@ class AuthService {
   Stream<User?> authStateChanges() {
     return _auth.authStateChanges();
   }
+
+  /// Get user data from Firestore
+  Future<UserBHT?> getUserFromCollection(String uid) async {
+    try {
+      DocumentSnapshot doc = await _userCollection.doc(uid).get();
+      if (doc.exists) {
+        return UserBHT(
+          id: doc['id'],
+          nama: doc['nama'],
+          email: doc['email'],
+          noTelp: doc['no_telp'],
+          role: doc['role'],
+        );
+      }
+      return null;
+    } catch (e) {
+      log("Error fetching user from collection: $e");
+      return null;
+    }
+  }
+
+  /// Update user data in Firestore
+  Future<void> updateUserInCollection(String uid, Map<String, dynamic> updates) async {
+    try {
+      await _userCollection.doc(uid).update(updates);
+    } catch (e) {
+      log("Error updating user: $e");
+      throw e;
+    }
+  }
+
+  /// Update email in Firebase Auth and send verification
+  Future<void> updateEmail(String newEmail) async {
+    final user = _auth.currentUser;
+    if (user == null) throw 'No signed-in user';
+
+    try {
+      await user.verifyBeforeUpdateEmail(newEmail);
+    } on FirebaseAuthException catch (e) {
+      throw e.message ?? 'Failed to update email';
+    }
+  }
 }

@@ -146,7 +146,7 @@ class _EventsCardState extends State<EventsCard> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: isDisabled ? null : widget.isRegistered ? widget.onCancel : widget.onRegister,
+              onPressed: widget.isRegistered ? widget.onCancel : isDisabled ? null :  widget.onRegister,
               style: ElevatedButton.styleFrom(
                 backgroundColor: isDisabled ? Colors.grey : Colors.red.shade700,
                 shape: RoundedRectangleBorder(
@@ -160,10 +160,10 @@ class _EventsCardState extends State<EventsCard> {
                   Text(
                     isPastEvent
                         ? 'Kegiatan Selesai'
-                        : isFull
-                        ? 'Penuh'
                         : widget.isRegistered
                         ? 'Cancel Pendaftaran'
+                        : isFull
+                        ? 'Penuh'
                         : 'Daftar Sekarang',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
