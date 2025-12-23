@@ -46,12 +46,18 @@ class LoginProvider extends ChangeNotifier {
         MaterialPageRoute(builder: (context) => WidgetTree()),
       );
     } catch (e) {
-      log("Login failed: $e");
+      String message = "An error occurred during login.";
+      print("Login failed: $e");
 
-      final message = e?.toString() ?? 'Login failed';
+      e == "The supplied auth credential is incorrect, malformed or has expired." 
+      ? message = "Email atau password salah."
+      : e == "Email not verified. A verification email has been sent. Please verify before logging in." 
+      ? message = "Email belum terverifikasi. Silakan cek email untuk verifikasi."
+      : null;
+
       ScaffoldMessenger.of(
         _context!,
-      ).showSnackBar(SnackBar(content: Text("login gagal: $message")));
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
