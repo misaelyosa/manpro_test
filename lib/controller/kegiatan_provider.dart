@@ -31,6 +31,7 @@ class KegiatanProvider extends ChangeNotifier {
     _context = context;
     getKegiatan();
     checkAdmin();
+    isLoggedIn();
   }
 
   final KegiatanRepo _repositoryKegiatan = KegiatanRepo();
@@ -40,6 +41,7 @@ class KegiatanProvider extends ChangeNotifier {
   List<Kegiatan> items = [];
   bool fetchingKegiatan = false;
   bool isAdmin = false;
+  bool loggedIn = false;
 
   final List<Kegiatan> events = [];
   final Map<String, bool> _registrationStatus = {};
@@ -157,6 +159,12 @@ class KegiatanProvider extends ChangeNotifier {
         .get();
 
     _registrationStatus[eventId] = doc.exists;
+    notifyListeners();
+  }
+
+  Future<void> isLoggedIn() async {
+    final user = await _auth.getLoggedUser();
+    loggedIn = user != null;
     notifyListeners();
   }
 

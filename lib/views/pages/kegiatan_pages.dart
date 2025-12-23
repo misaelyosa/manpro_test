@@ -108,6 +108,7 @@ Widget _body(BuildContext context, KegiatanProvider prov) {
                             prov.checkRegistrationStatus(event.id);
                             return EventsCard(
                               isadmin: prov.isAdmin,
+                              isLoggedIn: prov.loggedIn,
                               event: event,
                               isRegistered: prov.isRegistered(event.id),
                               onCancel: prov.isRegistered(event.id)

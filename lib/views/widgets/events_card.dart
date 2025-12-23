@@ -10,6 +10,7 @@ class EventsCard extends StatefulWidget {
     this.onRegister,
     this.onCancel,
     this.isadmin,
+    this.isLoggedIn,
   });
 
   final Kegiatan event;
@@ -17,6 +18,7 @@ class EventsCard extends StatefulWidget {
   final VoidCallback? onRegister;
   final VoidCallback? onCancel;
   final bool? isadmin;
+  final bool? isLoggedIn;
 
   @override
   State<EventsCard> createState() => _EventsCardState();
@@ -143,7 +145,7 @@ class _EventsCardState extends State<EventsCard> {
           const SizedBox(height: 12),
 
           /// REGISTER BUTTON
-          SizedBox(
+          (widget.isLoggedIn) ?? false ? SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: widget.isRegistered ? widget.onCancel : isDisabled ? null :  widget.onRegister,
@@ -180,7 +182,7 @@ class _EventsCardState extends State<EventsCard> {
                 ],
               ),
             ),
-          ),
+          ): SizedBox(width: 0,),
 
           /// ADMIN DETAIL BUTTON (only for admins)
           if (widget.isadmin == true) ...[
