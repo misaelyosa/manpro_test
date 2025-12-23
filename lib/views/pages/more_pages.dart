@@ -51,14 +51,14 @@ class _MorePagesState extends State<MorePages> {
   final String phone = "62895399852711";
   final String event = "Baca buku smeakin sehat";
   final List<Map<String, Object>> menuItems = const [
-    {"icon": Icons.history, "label": "Sejarah", "page": SejarahPage()},
-    {
-      "icon": Icons.event,
-      "label": "History Kegiatan",
-      "page": HistoryEventPages(),
-    },
-    {"icon": Icons.favorite, "label": "Donasi", "page": DonasiPage()},
-    {"icon": Icons.people, "label": "Kontak", "page": KontakPage()},
+    // {"icon": Icons.history, "label": "Sejarah", "page": SejarahPage()},
+    // {
+    //   "icon": Icons.event,
+    //   "label": "History Kegiatan",
+    //   "page": HistoryEventPages(),
+    // },
+    // {"icon": Icons.favorite, "label": "Donasi", "page": DonasiPage()},
+    // {"icon": Icons.people, "label": "Kontak", "page": KontakPage()},
     {"icon": Icons.person, "label": "Edit Profile", "page": EditProfilePage()},
   ];
 
