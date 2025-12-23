@@ -24,8 +24,12 @@ class EditProfileProvider extends ChangeNotifier {
 
   final AuthService _auth = AuthService();
   UserBHT? _currentUser;
+
   bool isLoading = true;
   bool isUpdating = false;
+
+  /// 🔐 EMAIL LOCK
+  bool canEditEmail = false;
 
   Future<void> loadUserData() async {
     final user = await _auth.getLoggedUser();
@@ -40,7 +44,7 @@ class EditProfileProvider extends ChangeNotifier {
   }
 
   // ===========================
-  // VALIDATIONS
+  // VALIDATION
   // ===========================
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) return "Email wajib diisi";
@@ -55,7 +59,32 @@ class EditProfileProvider extends ChangeNotifier {
   }
 
   // ===========================
-  // ACTION
+  // EMAIL RE-AUTH
+  // ===========================
+  Future<void> verifyPassword(String password) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || user.email == null) {
+      throw FirebaseAuthException(
+        code: 'user-not-found',
+        message: 'User tidak ditemukan',
+      );
+    }
+
+    final credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: password,
+    );
+
+    await user.reauthenticateWithCredential(credential);
+  }
+
+  void enableEmailEdit() {
+    canEditEmail = true;
+    notifyListeners();
+  }
+
+  // ===========================
+  // UPDATE PROFILE
   // ===========================
   Future<void> onUpdateProfile() async {
     if (!(formKey.currentState?.validate() ?? false)) return;
@@ -69,66 +98,56 @@ class EditProfileProvider extends ChangeNotifier {
     final newNoTelp = noTelpController.text.trim();
 
     try {
-      // Update Firestore
-      Map<String, dynamic> updates = {'nama': newNama, 'no_telp': newNoTelp};
-      await _auth.updateUserInCollection(_currentUser!.id, updates);
+      await _auth.updateUserInCollection(_currentUser!.id, {
+        'nama': newNama,
+        'no_telp': newNoTelp,
+      });
 
-      // If email changed, update Auth and send verification
       if (newEmail != _currentUser!.email) {
         await _auth.updateEmail(newEmail);
-        updates['email'] = newEmail;
 
-        // Update Firestore email too
         await _auth.updateUserInCollection(_currentUser!.id, {
           'email': newEmail,
         });
 
-        // Update SharedPref
         await _auth.logUserSharedpref(_currentUser!.id);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text(
-              'Profile updated. Verification email sent to new email. Please verify and login again.',
+              'Email berhasil diubah. Silakan verifikasi email baru dan login ulang.',
             ),
           ),
         );
 
-        // Logout and go to welcome
         await _auth.logout();
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (_) => WellcomePage()),
-          (route) => false,
+          (_) => false,
         );
       } else {
-        // Update SharedPref
         await _auth.logUserSharedpref(_currentUser!.id);
 
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Profile updated successfully')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile berhasil diperbarui')),
+        );
 
         Navigator.pop(context);
       }
+
+      canEditEmail = false;
     } on FirebaseAuthException catch (e) {
       String message = "Terjadi kesalahan";
 
       if (e.code == 'email-already-in-use') {
         message = "Email sudah digunakan";
-      } else if (e.code == 'invalid-email') {
-        message = "Format email salah";
       } else if (e.code == 'requires-recent-login') {
         message = "Silakan login ulang untuk mengubah email";
       }
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(message)));
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
     } finally {
       isUpdating = false;
       notifyListeners();

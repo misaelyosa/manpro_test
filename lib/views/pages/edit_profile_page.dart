@@ -14,36 +14,25 @@ class EditProfilePage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(
+          title: const Text("Edit Profile"),
           centerTitle: true,
           backgroundColor: Colors.white,
+          foregroundColor: AppColors.primary,
           elevation: 0.5,
-          foregroundColor: AppColors.darkRed,
           systemOverlayStyle: const SystemUiOverlayStyle(
             statusBarColor: Colors.white,
             statusBarIconBrightness: Brightness.dark,
-            statusBarBrightness: Brightness.light,
-          ),
-          title: const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: Text(
-              "Edit Profile",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.darkRed,
-              ),
-            ),
           ),
         ),
         body: SafeArea(
           child: Consumer<EditProfileProvider>(
-            builder: (context, provider, child) {
+            builder: (context, provider, _) {
               if (provider.isLoading) {
                 return const Center(child: CircularProgressIndicator());
               }
 
               return Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 child: Form(
                   key: provider.formKey,
                   child: Column(
@@ -54,41 +43,49 @@ class EditProfilePage extends StatelessWidget {
                           labelText: 'Nama',
                           border: OutlineInputBorder(),
                         ),
-                        validator: (value) =>
-                            provider.validateNotEmpty(value, 'Nama'),
+                        validator: (v) => provider.validateNotEmpty(v, 'Nama'),
                       ),
                       const SizedBox(height: 16),
+
+                      /// 🔐 EMAIL FIELD
                       TextFormField(
-                        readOnly: true,
                         controller: provider.emailController,
-                        textAlignVertical: TextAlignVertical.center,
+                        readOnly: !provider.canEditEmail,
                         decoration: InputDecoration(
                           labelText: 'Email',
-                          border: OutlineInputBorder(),
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              verifyEmailPassDialog(
-                                context,
-                                provider.emailController.text,
-                              );
-                            },
-                            icon: Icon(Icons.edit, color: AppColors.primary),
-                          ),
+                          border: const OutlineInputBorder(),
+                          suffixIcon: !provider.canEditEmail
+                              ? IconButton(
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: AppColors.primary,
+                                  ),
+                                  onPressed: () async {
+                                    final ok = await verifyEmailPassDialog(
+                                      context,
+                                      provider,
+                                      provider.emailController.text,
+                                    );
+                                    if (ok) provider.enableEmailEdit();
+                                  },
+                                )
+                              : null,
                         ),
-
                         validator: provider.validateEmail,
                       ),
                       const SizedBox(height: 16),
+
                       TextFormField(
                         controller: provider.noTelpController,
                         decoration: const InputDecoration(
                           labelText: 'No Telepon',
                           border: OutlineInputBorder(),
                         ),
-                        validator: (value) =>
-                            provider.validateNotEmpty(value, 'No Telepon'),
+                        validator: (v) =>
+                            provider.validateNotEmpty(v, 'No Telepon'),
                       ),
                       const SizedBox(height: 24),
+
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -97,10 +94,7 @@ class EditProfilePage extends StatelessWidget {
                               : provider.onUpdateProfile,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           child: provider.isUpdating
                               ? const CircularProgressIndicator(
@@ -109,8 +103,8 @@ class EditProfilePage extends StatelessWidget {
                               : const Text(
                                   'Update Profile',
                                   style: TextStyle(
-                                    fontWeight: FontWeight.bold,
                                     color: Colors.white,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                         ),
@@ -125,65 +119,66 @@ class EditProfilePage extends StatelessWidget {
       ),
     );
   }
-}
 
-Future<void> verifyEmailPassDialog(BuildContext context, String email) async {
-  final passController = TextEditingController();
-  // final emailController = TextEditingController();
+  Future<bool> verifyEmailPassDialog(
+    BuildContext context,
+    EditProfileProvider provider,
+    String email,
+  ) async {
+    final passController = TextEditingController();
+    bool verified = false;
 
-  return showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (ctx) {
-      return AlertDialog(
-        backgroundColor: Colors.white,
-        title: const Text(
-          "Konfirmasi Perubahan Email",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primary,
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text("Konfirmasi Password"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                initialValue: email,
+                readOnly: true,
+                decoration: const InputDecoration(
+                  labelText: "Email Saat Ini",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: passController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: "Password",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
           ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              initialValue: email,
-              readOnly: true,
-              decoration: const InputDecoration(
-                labelText: "Email Saat Ini",
-                border: OutlineInputBorder(),
-              ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text("Batal"),
             ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: passController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: "Password",
-                border: OutlineInputBorder(),
-              ),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  await provider.verifyPassword(passController.text);
+                  verified = true;
+                  Navigator.pop(ctx);
+                } catch (_) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Password salah")),
+                  );
+                }
+              },
+              child: const Text("Lanjutkan"),
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            style: TextButton.styleFrom(),
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text("Batal", style: TextStyle(color: AppColors.gray)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-            child: const Text(
-              "Lanjutkan",
-              style: TextStyle(color: AppColors.white),
-            ),
-          ),
-        ],
-      );
-    },
-  );
+        );
+      },
+    );
+    return verified;
+  }
 }
