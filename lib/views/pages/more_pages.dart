@@ -6,19 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:media_store_plus/media_store_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:rasadharma_app/data/repository/auth_service.dart';
 import 'package:rasadharma_app/theme/colors.dart';
-import 'package:rasadharma_app/views/pages/donasi_page.dart';
-import 'package:rasadharma_app/views/pages/history_event_pages.dart';
-import 'package:rasadharma_app/views/pages/kegiatan_pages.dart';
-import 'package:rasadharma_app/views/pages/kontak_page.dart';
-import 'package:rasadharma_app/views/pages/sejarah_page.dart';
+import 'package:rasadharma_app/views/pages/riwayat_kegiatan.dart';
 import 'package:rasadharma_app/views/pages/edit_profile_page.dart';
 import 'package:rasadharma_app/views/pages/wellcome_page.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:http/http.dart' as http;
 
 final String apiKey = "6BivGVvK7AG4WaUUsHMg";
 
@@ -52,11 +44,11 @@ class _MorePagesState extends State<MorePages> {
   final String event = "Baca buku smeakin sehat";
   final List<Map<String, Object>> menuItems = const [
     // {"icon": Icons.history, "label": "Sejarah", "page": SejarahPage()},
-    // {
-    //   "icon": Icons.event,
-    //   "label": "History Kegiatan",
-    //   "page": HistoryEventPages(),
-    // },
+    {
+      "icon": Icons.event,
+      "label": "Riwayat Kegiatan",
+      "page": RiwayatKegiatanPage(),
+    },
     // {"icon": Icons.favorite, "label": "Donasi", "page": DonasiPage()},
     // {"icon": Icons.people, "label": "Kontak", "page": KontakPage()},
     {"icon": Icons.person, "label": "Edit Profile", "page": EditProfilePage()},

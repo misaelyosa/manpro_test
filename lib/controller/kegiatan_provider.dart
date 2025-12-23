@@ -29,9 +29,14 @@ class KegiatanProvider extends ChangeNotifier {
   BuildContext? _context;
   KegiatanProvider.withContext(BuildContext context) {
     _context = context;
-    getKegiatan();
-    checkAdmin();
-    isLoggedIn();
+    _init();
+  }
+
+  Future<void> _init() async {
+    await getKegiatan();
+    await loadUserRegistrations();
+    await checkAdmin();
+    await isLoggedIn();
   }
 
   final KegiatanRepo _repositoryKegiatan = KegiatanRepo();
@@ -63,9 +68,27 @@ class KegiatanProvider extends ChangeNotifier {
   Future<void> checkAdmin() async {
     final user = await _auth.getLoggedUser();
     if (user == null) return;
-
-    // adjust according to your user model
     isAdmin = user.role == 'admin';
+    notifyListeners();
+  }
+
+  Future<void> loadUserRegistrations() async {
+    final user = await _auth.getLoggedUser();
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    for (final event in events) {
+      final doc = await firestore
+          .collection('kegiatan')
+          .doc(event.id)
+          .collection('registrations')
+          .doc(user.id)
+          .get();
+
+      _registrationStatus[event.id] = doc.exists;
+    }
+
     notifyListeners();
   }
 
@@ -296,7 +319,8 @@ class KegiatanProvider extends ChangeNotifier {
         });
       });
 
-      final message = '''${user.nama} Membatalkan Pendaftaran ${e.namaKegiatan} 📢''';
+      final message =
+          '''${user.nama} Membatalkan Pendaftaran ${e.namaKegiatan} 📢''';
 
       await sendWaFonnte(adminPhone: '6287855570801', message: message);
 
