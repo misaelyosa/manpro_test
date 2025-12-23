@@ -53,11 +53,25 @@ class KegiatanProvider extends ChangeNotifier {
 
   bool isRegistered(String eventId) => _registrationStatus[eventId] ?? false;
 
-  List<Kegiatan> get upcoming =>
-      events.where((e) => e.tanggalKegiatan.isAfter(DateTime.now())).toList();
+  DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
-  List<Kegiatan> get past =>
-      events.where((e) => !e.tanggalKegiatan.isAfter(DateTime.now())).toList();
+  List<Kegiatan> get upcoming {
+    final today = _dateOnly(DateTime.now());
+
+    return events.where((e) {
+      final eventDate = _dateOnly(e.tanggalKegiatan);
+      return !eventDate.isBefore(today);
+    }).toList();
+  }
+
+  List<Kegiatan> get past {
+    final today = _dateOnly(DateTime.now());
+
+    return events.where((e) {
+      final eventDate = _dateOnly(e.tanggalKegiatan);
+      return eventDate.isBefore(today);
+    }).toList();
+  }
 
   Future<void> onSelected(int i) async {
     selectedIndex = i;

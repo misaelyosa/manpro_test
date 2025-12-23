@@ -127,6 +127,25 @@ Widget _body(BuildContext context, KegiatanProvider prov) {
   );
 }
 
+String _formatTime(TimeOfDay time) {
+  final hour = time.hour.toString().padLeft(2, '0');
+  final minute = time.minute.toString().padLeft(2, '0');
+  return '$hour:$minute';
+}
+
+TimeOfDay _parseTime(String time) {
+  final parts = time.split(':');
+  return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+}
+
+bool _isTimeBefore(String start, String end) {
+  final startTime = _parseTime(start);
+  final endTime = _parseTime(end);
+
+  return (startTime.hour < endTime.hour) ||
+      (startTime.hour == endTime.hour && startTime.minute < endTime.minute);
+}
+
 void _showAddKegiatanModal(BuildContext context, KegiatanProvider prov) {
   final _formKey = GlobalKey<FormState>();
   final _namaController = TextEditingController();
@@ -236,17 +255,28 @@ void _showAddKegiatanModal(BuildContext context, KegiatanProvider prov) {
               ),
               const SizedBox(height: 12),
 
-              // Waktu Mulai & Selesai
+              // Waktu Mulai & Selesai (Time Picker)
               Row(
                 children: [
                   Expanded(
                     child: TextFormField(
                       controller: _waktuMulaiController,
+                      readOnly: true,
                       decoration: const InputDecoration(
                         labelText: 'Waktu Mulai',
                         border: OutlineInputBorder(),
-                        hintText: 'HH:MM',
+                        suffixIcon: Icon(Icons.access_time),
                       ),
+                      onTap: () async {
+                        final picked = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+
+                        if (picked != null) {
+                          _waktuMulaiController.text = _formatTime(picked);
+                        }
+                      },
                       validator: (value) => value?.isEmpty ?? true
                           ? 'Waktu mulai wajib diisi'
                           : null,
@@ -256,18 +286,45 @@ void _showAddKegiatanModal(BuildContext context, KegiatanProvider prov) {
                   Expanded(
                     child: TextFormField(
                       controller: _waktuSelesaiController,
+                      readOnly: true,
                       decoration: const InputDecoration(
                         labelText: 'Waktu Selesai',
                         border: OutlineInputBorder(),
-                        hintText: 'HH:MM',
+                        suffixIcon: Icon(Icons.access_time),
                       ),
-                      validator: (value) => value?.isEmpty ?? true
-                          ? 'Waktu selesai wajib diisi'
-                          : null,
+                      onTap: () async {
+                        final picked = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+
+                        if (picked != null) {
+                          _waktuSelesaiController.text = _formatTime(picked);
+                        }
+                      },
+                      validator: (value) {
+                        if (value?.isEmpty ?? true) {
+                          return 'Waktu selesai wajib diisi';
+                        }
+
+                        if (_waktuMulaiController.text.isNotEmpty) {
+                          final isValid = _isTimeBefore(
+                            _waktuMulaiController.text,
+                            value!,
+                          );
+
+                          if (!isValid) {
+                            return 'Waktu selesai harus lebih besar dari waktu mulai';
+                          }
+                        }
+
+                        return null;
+                      },
                     ),
                   ),
                 ],
               ),
+
               const SizedBox(height: 12),
 
               // Lokasi
